@@ -95,9 +95,9 @@ sep_upsample(j_decompress_ptr cinfo, JSAMPIMAGE input_buf,
   if (num_rows > out_rows_avail)
     num_rows = out_rows_avail;
 
-  (*cinfo->cconvert->color_convert) (cinfo, upsample->color_buf,
-                                     (JDIMENSION)upsample->next_row_out,
-                                     output_buf + *out_row_ctr, (int)num_rows);
+  (*cinfo->cconvert->color_deconvert) (cinfo, upsample->color_buf,
+				       (JDIMENSION)upsample->next_row_out,
+				       output_buf + *out_row_ctr, (int)num_rows);
 
   /* Adjust counts */
   *out_row_ctr += num_rows;

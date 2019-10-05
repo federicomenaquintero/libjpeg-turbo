@@ -261,7 +261,7 @@ typedef void (* jpeg_color_deconvert_fn) (j_decompress_ptr cinfo, JSAMPIMAGE inp
 					  int num_rows);
 struct jpeg_color_deconverter {
   void (*start_pass) (j_decompress_ptr cinfo);
-  jpeg_color_deconvert_fn color_convert;
+  jpeg_color_deconvert_fn color_deconvert;
 };
 
 /* Color quantization or color precision reduction */
