@@ -852,7 +852,10 @@ DLLEXPORT int tjEncodeYUVPlanes(tjhandle handle, const unsigned char *srcBuf,
   }
 
   for (row = 0; row < ph0; row += cinfo->max_v_samp_factor) {
-    (*cinfo->cconvert->color_convert) (cinfo, &row_pointer[row], tmpbuf, 0,
+    struct jpeg_color_converter_input input;
+
+    input = jinit_converter_input(cinfo, &row_pointer[row]);
+    (*cinfo->cconvert->color_convert) (&input, tmpbuf, 0,
                                        cinfo->max_v_samp_factor);
     (cinfo->downsample->downsample) (cinfo, tmpbuf, 0, tmpbuf2, 0);
     for (i = 0, compptr = cinfo->comp_info; i < cinfo->num_components;

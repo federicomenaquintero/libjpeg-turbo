@@ -108,13 +108,13 @@ jsimd_c_can_null_convert(void)
 }
 
 GLOBAL(void)
-jsimd_rgb_ycc_convert(j_compress_ptr cinfo, JSAMPARRAY input_buf,
+jsimd_rgb_ycc_convert(struct jpeg_color_converter_input *input,
                       JSAMPIMAGE output_buf, JDIMENSION output_row,
                       int num_rows)
 {
   void (*mmifct) (JDIMENSION, JSAMPARRAY, JSAMPIMAGE, JDIMENSION, int);
 
-  switch (cinfo->in_color_space) {
+  switch (input->in_color_space) {
   case JCS_EXT_RGB:
     mmifct = jsimd_extrgb_ycc_convert_mmi;
     break;
@@ -142,11 +142,11 @@ jsimd_rgb_ycc_convert(j_compress_ptr cinfo, JSAMPARRAY input_buf,
     break;
   }
 
-  mmifct(cinfo->image_width, input_buf, output_buf, output_row, num_rows);
+  mmifct(input->image_width, input->input_buf, output_buf, output_row, num_rows);
 }
 
 GLOBAL(void)
-jsimd_rgb_gray_convert(j_compress_ptr cinfo, JSAMPARRAY input_buf,
+jsimd_rgb_gray_convert(struct jpeg_color_converter_input *input,
                        JSAMPIMAGE output_buf, JDIMENSION output_row,
                        int num_rows)
 {
@@ -198,7 +198,7 @@ jsimd_ycc_rgb565_convert(j_decompress_ptr cinfo, JSAMPIMAGE input_buf,
 }
 
 GLOBAL(void)
-jsimd_c_null_convert(j_compress_ptr cinfo, JSAMPARRAY input_buf,
+jsimd_c_null_convert(struct jpeg_color_converter_input *input,
                      JSAMPIMAGE output_buf, JDIMENSION output_row,
                      int num_rows)
 {

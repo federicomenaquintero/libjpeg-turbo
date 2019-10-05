@@ -93,8 +93,21 @@ struct jpeg_c_coef_controller {
 };
 
 /* Colorspace conversion */
-typedef void (* jpeg_color_convert_fn) (j_compress_ptr cinfo, JSAMPARRAY input_buf,
-					JSAMPIMAGE output_buf, JDIMENSION output_row,
+struct jpeg_color_converter_input {
+  JSAMPARRAY input_buf;
+  JDIMENSION image_width;
+  J_COLOR_SPACE in_color_space;
+  int input_components;
+  int num_components;
+  JLONG *rgb_ycc_tab;  
+};
+
+EXTERN(struct jpeg_color_converter_input) jinit_converter_input(j_compress_ptr cinfo,
+								JSAMPARRAY input_buf);
+
+typedef void (* jpeg_color_convert_fn) (struct jpeg_color_converter_input *input,
+					JSAMPIMAGE output_buf,
+					JDIMENSION output_row,
 					int num_rows);
 
 struct jpeg_color_converter {

@@ -221,13 +221,13 @@ jsimd_can_ycc_rgb565(void)
 }
 
 GLOBAL(void)
-jsimd_rgb_ycc_convert(j_compress_ptr cinfo, JSAMPARRAY input_buf,
+jsimd_rgb_ycc_convert(struct jpeg_color_converter_input *input,
                       JSAMPIMAGE output_buf, JDIMENSION output_row,
                       int num_rows)
 {
   void (*altivecfct) (JDIMENSION, JSAMPARRAY, JSAMPIMAGE, JDIMENSION, int);
 
-  switch (cinfo->in_color_space) {
+  switch (input->in_color_space) {
   case JCS_EXT_RGB:
     altivecfct = jsimd_extrgb_ycc_convert_altivec;
     break;
@@ -255,17 +255,17 @@ jsimd_rgb_ycc_convert(j_compress_ptr cinfo, JSAMPARRAY input_buf,
     break;
   }
 
-  altivecfct(cinfo->image_width, input_buf, output_buf, output_row, num_rows);
+  altivecfct(input->img_width, input->input_buf, output_buf, output_row, num_rows);
 }
 
 GLOBAL(void)
-jsimd_rgb_gray_convert(j_compress_ptr cinfo, JSAMPARRAY input_buf,
+jsimd_rgb_gray_convert(struct jpeg_color_converter_input input, JSAMPARRAY input_buf,
                        JSAMPIMAGE output_buf, JDIMENSION output_row,
                        int num_rows)
 {
   void (*altivecfct) (JDIMENSION, JSAMPARRAY, JSAMPIMAGE, JDIMENSION, int);
 
-  switch (cinfo->in_color_space) {
+  switch (input.in_color_space) {
   case JCS_EXT_RGB:
     altivecfct = jsimd_extrgb_gray_convert_altivec;
     break;
@@ -293,7 +293,7 @@ jsimd_rgb_gray_convert(j_compress_ptr cinfo, JSAMPARRAY input_buf,
     break;
   }
 
-  altivecfct(cinfo->image_width, input_buf, output_buf, output_row, num_rows);
+  altivecfct(input.image_width, input_buf, output_buf, output_row, num_rows);
 }
 
 GLOBAL(void)

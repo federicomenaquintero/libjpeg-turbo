@@ -204,13 +204,13 @@ jsimd_can_ycc_rgb565(void)
 }
 
 GLOBAL(void)
-jsimd_rgb_ycc_convert(j_compress_ptr cinfo, JSAMPARRAY input_buf,
+jsimd_rgb_ycc_convert(struct jpeg_color_converter_input *input,
                       JSAMPIMAGE output_buf, JDIMENSION output_row,
                       int num_rows)
 {
   void (*neonfct) (JDIMENSION, JSAMPARRAY, JSAMPIMAGE, JDIMENSION, int);
 
-  switch (cinfo->in_color_space) {
+  switch (input->in_color_space) {
   case JCS_EXT_RGB:
     neonfct = jsimd_extrgb_ycc_convert_neon;
     break;
@@ -238,11 +238,11 @@ jsimd_rgb_ycc_convert(j_compress_ptr cinfo, JSAMPARRAY input_buf,
     break;
   }
 
-  neonfct(cinfo->image_width, input_buf, output_buf, output_row, num_rows);
+  neonfct(input->image_width, input->input_buf, output_buf, output_row, num_rows);
 }
 
 GLOBAL(void)
-jsimd_rgb_gray_convert(j_compress_ptr cinfo, JSAMPARRAY input_buf,
+jsimd_rgb_gray_convert(struct jpeg_color_converter_input *input,
                        JSAMPIMAGE output_buf, JDIMENSION output_row,
                        int num_rows)
 {

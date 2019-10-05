@@ -190,6 +190,25 @@ typedef my_color_converter *my_cconvert_ptr;
 #undef rgb_rgb_convert_internal
 
 
+/* Set up a converter input structure to feed the converters.  Copies just the fields
+ * from cinfo that the converters will use, so they don't have to deal with the whole
+ * cinfo structure themselves.
+ */
+GLOBAL(struct jpeg_color_converter_input)
+jinit_converter_input(j_compress_ptr cinfo, JSAMPARRAY input_buf)
+{
+  struct jpeg_color_converter_input input = { 0, };
+  my_cconvert_ptr cconvert = (my_cconvert_ptr)cinfo->cconvert;
+
+  input.input_buf = input_buf;
+  input.image_width = cinfo->image_width;
+  input.in_color_space = cinfo->in_color_space;
+  input.input_components = cinfo->input_components;
+  input.num_components = cinfo->num_components;
+  input.rgb_ycc_tab = cconvert->rgb_ycc_tab;
+  return input;
+}
+
 /*
  * Initialize for RGB->YCC colorspace conversion.
  */
@@ -231,41 +250,34 @@ rgb_ycc_start(j_compress_ptr cinfo)
  */
 
 METHODDEF(void)
-rgb_ycc_convert(j_compress_ptr cinfo, JSAMPARRAY input_buf,
+rgb_ycc_convert(struct jpeg_color_converter_input *input,
                 JSAMPIMAGE output_buf, JDIMENSION output_row, int num_rows)
 {
-  switch (cinfo->in_color_space) {
+  switch (input->in_color_space) {
   case JCS_EXT_RGB:
-    extrgb_ycc_convert_internal(cinfo, input_buf, output_buf, output_row,
-                                num_rows);
+    extrgb_ycc_convert_internal(input, output_buf, output_row, num_rows);
     break;
   case JCS_EXT_RGBX:
   case JCS_EXT_RGBA:
-    extrgbx_ycc_convert_internal(cinfo, input_buf, output_buf, output_row,
-                                 num_rows);
+    extrgbx_ycc_convert_internal(input, output_buf, output_row, num_rows);
     break;
   case JCS_EXT_BGR:
-    extbgr_ycc_convert_internal(cinfo, input_buf, output_buf, output_row,
-                                num_rows);
+    extbgr_ycc_convert_internal(input, output_buf, output_row, num_rows);
     break;
   case JCS_EXT_BGRX:
   case JCS_EXT_BGRA:
-    extbgrx_ycc_convert_internal(cinfo, input_buf, output_buf, output_row,
-                                 num_rows);
+    extbgrx_ycc_convert_internal(input, output_buf, output_row, num_rows);
     break;
   case JCS_EXT_XBGR:
   case JCS_EXT_ABGR:
-    extxbgr_ycc_convert_internal(cinfo, input_buf, output_buf, output_row,
-                                 num_rows);
+    extxbgr_ycc_convert_internal(input, output_buf, output_row, num_rows);
     break;
   case JCS_EXT_XRGB:
   case JCS_EXT_ARGB:
-    extxrgb_ycc_convert_internal(cinfo, input_buf, output_buf, output_row,
-                                 num_rows);
+    extxrgb_ycc_convert_internal(input, output_buf, output_row, num_rows);
     break;
   default:
-    rgb_ycc_convert_internal(cinfo, input_buf, output_buf, output_row,
-                             num_rows);
+    rgb_ycc_convert_internal(input, output_buf, output_row, num_rows);
     break;
   }
 }
@@ -279,41 +291,34 @@ rgb_ycc_convert(j_compress_ptr cinfo, JSAMPARRAY input_buf,
  */
 
 METHODDEF(void)
-rgb_gray_convert(j_compress_ptr cinfo, JSAMPARRAY input_buf,
+rgb_gray_convert(struct jpeg_color_converter_input *input,
                  JSAMPIMAGE output_buf, JDIMENSION output_row, int num_rows)
 {
-  switch (cinfo->in_color_space) {
+  switch (input->in_color_space) {
   case JCS_EXT_RGB:
-    extrgb_gray_convert_internal(cinfo, input_buf, output_buf, output_row,
-                                 num_rows);
+    extrgb_gray_convert_internal(input, output_buf, output_row, num_rows);
     break;
   case JCS_EXT_RGBX:
   case JCS_EXT_RGBA:
-    extrgbx_gray_convert_internal(cinfo, input_buf, output_buf, output_row,
-                                  num_rows);
+    extrgbx_gray_convert_internal(input, output_buf, output_row, num_rows);
     break;
   case JCS_EXT_BGR:
-    extbgr_gray_convert_internal(cinfo, input_buf, output_buf, output_row,
-                                 num_rows);
+    extbgr_gray_convert_internal(input, output_buf, output_row, num_rows);
     break;
   case JCS_EXT_BGRX:
   case JCS_EXT_BGRA:
-    extbgrx_gray_convert_internal(cinfo, input_buf, output_buf, output_row,
-                                  num_rows);
+    extbgrx_gray_convert_internal(input, output_buf, output_row, num_rows);
     break;
   case JCS_EXT_XBGR:
   case JCS_EXT_ABGR:
-    extxbgr_gray_convert_internal(cinfo, input_buf, output_buf, output_row,
-                                  num_rows);
+    extxbgr_gray_convert_internal(input, output_buf, output_row, num_rows);
     break;
   case JCS_EXT_XRGB:
   case JCS_EXT_ARGB:
-    extxrgb_gray_convert_internal(cinfo, input_buf, output_buf, output_row,
-                                  num_rows);
+    extxrgb_gray_convert_internal(input, output_buf, output_row, num_rows);
     break;
   default:
-    rgb_gray_convert_internal(cinfo, input_buf, output_buf, output_row,
-                              num_rows);
+    rgb_gray_convert_internal(input, output_buf, output_row, num_rows);
     break;
   }
 }
@@ -324,41 +329,34 @@ rgb_gray_convert(j_compress_ptr cinfo, JSAMPARRAY input_buf,
  */
 
 METHODDEF(void)
-rgb_rgb_convert(j_compress_ptr cinfo, JSAMPARRAY input_buf,
+rgb_rgb_convert(struct jpeg_color_converter_input *input,
                 JSAMPIMAGE output_buf, JDIMENSION output_row, int num_rows)
 {
-  switch (cinfo->in_color_space) {
+  switch (input->in_color_space) {
   case JCS_EXT_RGB:
-    extrgb_rgb_convert_internal(cinfo, input_buf, output_buf, output_row,
-                                num_rows);
+    extrgb_rgb_convert_internal(input, output_buf, output_row, num_rows);
     break;
   case JCS_EXT_RGBX:
   case JCS_EXT_RGBA:
-    extrgbx_rgb_convert_internal(cinfo, input_buf, output_buf, output_row,
-                                 num_rows);
+    extrgbx_rgb_convert_internal(input, output_buf, output_row, num_rows);
     break;
   case JCS_EXT_BGR:
-    extbgr_rgb_convert_internal(cinfo, input_buf, output_buf, output_row,
-                                num_rows);
+    extbgr_rgb_convert_internal(input, output_buf, output_row, num_rows);
     break;
   case JCS_EXT_BGRX:
   case JCS_EXT_BGRA:
-    extbgrx_rgb_convert_internal(cinfo, input_buf, output_buf, output_row,
-                                 num_rows);
+    extbgrx_rgb_convert_internal(input, output_buf, output_row, num_rows);
     break;
   case JCS_EXT_XBGR:
   case JCS_EXT_ABGR:
-    extxbgr_rgb_convert_internal(cinfo, input_buf, output_buf, output_row,
-                                 num_rows);
+    extxbgr_rgb_convert_internal(input, output_buf, output_row, num_rows);
     break;
   case JCS_EXT_XRGB:
   case JCS_EXT_ARGB:
-    extxrgb_rgb_convert_internal(cinfo, input_buf, output_buf, output_row,
-                                 num_rows);
+    extxrgb_rgb_convert_internal(input, output_buf, output_row, num_rows);
     break;
   default:
-    rgb_rgb_convert_internal(cinfo, input_buf, output_buf, output_row,
-                             num_rows);
+    rgb_rgb_convert_internal(input, output_buf, output_row, num_rows);
     break;
   }
 }
@@ -373,16 +371,16 @@ rgb_rgb_convert(j_compress_ptr cinfo, JSAMPARRAY input_buf,
  */
 
 METHODDEF(void)
-cmyk_ycck_convert(j_compress_ptr cinfo, JSAMPARRAY input_buf,
+cmyk_ycck_convert(struct jpeg_color_converter_input *input,
                   JSAMPIMAGE output_buf, JDIMENSION output_row, int num_rows)
 {
-  my_cconvert_ptr cconvert = (my_cconvert_ptr)cinfo->cconvert;
   register int r, g, b;
-  register JLONG *ctab = cconvert->rgb_ycc_tab;
+  register JLONG *ctab = input->rgb_ycc_tab;
   register JSAMPROW inptr;
   register JSAMPROW outptr0, outptr1, outptr2, outptr3;
   register JDIMENSION col;
-  JDIMENSION num_cols = cinfo->image_width;
+  JDIMENSION num_cols = input->image_width;
+  JSAMPARRAY input_buf = input->input_buf;
 
   while (--num_rows >= 0) {
     inptr = *input_buf++;
@@ -424,14 +422,15 @@ cmyk_ycck_convert(j_compress_ptr cinfo, JSAMPARRAY input_buf,
  */
 
 METHODDEF(void)
-grayscale_convert(j_compress_ptr cinfo, JSAMPARRAY input_buf,
+grayscale_convert(struct jpeg_color_converter_input *input,
                   JSAMPIMAGE output_buf, JDIMENSION output_row, int num_rows)
 {
   register JSAMPROW inptr;
   register JSAMPROW outptr;
   register JDIMENSION col;
-  JDIMENSION num_cols = cinfo->image_width;
-  int instride = cinfo->input_components;
+  JDIMENSION num_cols = input->image_width;
+  int instride = input->input_components;
+  JSAMPARRAY input_buf = input->input_buf;
 
   while (--num_rows >= 0) {
     inptr = *input_buf++;
@@ -452,15 +451,20 @@ grayscale_convert(j_compress_ptr cinfo, JSAMPARRAY input_buf,
  */
 
 METHODDEF(void)
-null_convert(j_compress_ptr cinfo, JSAMPARRAY input_buf, JSAMPIMAGE output_buf,
+null_convert(struct jpeg_color_converter_input *input, JSAMPIMAGE output_buf,
              JDIMENSION output_row, int num_rows)
 {
   register JSAMPROW inptr;
   register JSAMPROW outptr, outptr0, outptr1, outptr2, outptr3;
   register JDIMENSION col;
   register int ci;
-  int nc = cinfo->num_components;
-  JDIMENSION num_cols = cinfo->image_width;
+  /* FMQ: this was cinfo->num_components, but see the comment above where
+   * it is assumed that input_components == num_components.  Should we assert that?
+   * Does the caller check it?
+   */
+  int nc = input->input_components;
+  JDIMENSION num_cols = input->image_width;
+  JSAMPARRAY input_buf = input->input_buf;
 
   if (nc == 3) {
     while (--num_rows >= 0) {

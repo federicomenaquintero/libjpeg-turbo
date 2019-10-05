@@ -145,14 +145,14 @@ jsimd_can_ycc_rgb565(void)
 }
 
 GLOBAL(void)
-jsimd_rgb_ycc_convert(j_compress_ptr cinfo, JSAMPARRAY input_buf,
+jsimd_rgb_ycc_convert(struct jpeg_color_converter_input *input,
                       JSAMPIMAGE output_buf, JDIMENSION output_row,
                       int num_rows)
 {
   void (*avx2fct) (JDIMENSION, JSAMPARRAY, JSAMPIMAGE, JDIMENSION, int);
   void (*sse2fct) (JDIMENSION, JSAMPARRAY, JSAMPIMAGE, JDIMENSION, int);
 
-  switch (cinfo->in_color_space) {
+  switch (input->in_color_space) {
   case JCS_EXT_RGB:
     avx2fct = jsimd_extrgb_ycc_convert_avx2;
     sse2fct = jsimd_extrgb_ycc_convert_sse2;
@@ -188,20 +188,20 @@ jsimd_rgb_ycc_convert(j_compress_ptr cinfo, JSAMPARRAY input_buf,
   }
 
   if (simd_support & JSIMD_AVX2)
-    avx2fct(cinfo->image_width, input_buf, output_buf, output_row, num_rows);
+    avx2fct(input->image_width, input->input_buf, output_buf, output_row, num_rows);
   else
-    sse2fct(cinfo->image_width, input_buf, output_buf, output_row, num_rows);
+    sse2fct(input->image_width, input->input_buf, output_buf, output_row, num_rows);
 }
 
 GLOBAL(void)
-jsimd_rgb_gray_convert(j_compress_ptr cinfo, JSAMPARRAY input_buf,
+jsimd_rgb_gray_convert(struct jpeg_color_converter_input *input,
                        JSAMPIMAGE output_buf, JDIMENSION output_row,
                        int num_rows)
 {
   void (*avx2fct) (JDIMENSION, JSAMPARRAY, JSAMPIMAGE, JDIMENSION, int);
   void (*sse2fct) (JDIMENSION, JSAMPARRAY, JSAMPIMAGE, JDIMENSION, int);
 
-  switch (cinfo->in_color_space) {
+  switch (input->in_color_space) {
   case JCS_EXT_RGB:
     avx2fct = jsimd_extrgb_gray_convert_avx2;
     sse2fct = jsimd_extrgb_gray_convert_sse2;
@@ -237,9 +237,9 @@ jsimd_rgb_gray_convert(j_compress_ptr cinfo, JSAMPARRAY input_buf,
   }
 
   if (simd_support & JSIMD_AVX2)
-    avx2fct(cinfo->image_width, input_buf, output_buf, output_row, num_rows);
+    avx2fct(input->image_width, input->input_buf, output_buf, output_row, num_rows);
   else
-    sse2fct(cinfo->image_width, input_buf, output_buf, output_row, num_rows);
+    sse2fct(input->image_width, input->input_buf, output_buf, output_row, num_rows);
 }
 
 GLOBAL(void)

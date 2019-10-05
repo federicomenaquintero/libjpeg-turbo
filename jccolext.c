@@ -29,17 +29,17 @@
 
 INLINE
 LOCAL(void)
-rgb_ycc_convert_internal(j_compress_ptr cinfo, JSAMPARRAY input_buf,
+rgb_ycc_convert_internal(struct jpeg_color_converter_input *input,
                          JSAMPIMAGE output_buf, JDIMENSION output_row,
                          int num_rows)
 {
-  my_cconvert_ptr cconvert = (my_cconvert_ptr)cinfo->cconvert;
   register int r, g, b;
-  register JLONG *ctab = cconvert->rgb_ycc_tab;
+  register JLONG *ctab = input->rgb_ycc_tab;
   register JSAMPROW inptr;
   register JSAMPROW outptr0, outptr1, outptr2;
   register JDIMENSION col;
-  JDIMENSION num_cols = cinfo->image_width;
+  JDIMENSION num_cols = input->image_width;
+  JSAMPARRAY input_buf = input->input_buf;
 
   while (--num_rows >= 0) {
     inptr = *input_buf++;
@@ -83,17 +83,17 @@ rgb_ycc_convert_internal(j_compress_ptr cinfo, JSAMPARRAY input_buf,
 
 INLINE
 LOCAL(void)
-rgb_gray_convert_internal(j_compress_ptr cinfo, JSAMPARRAY input_buf,
+rgb_gray_convert_internal(struct jpeg_color_converter_input *input,
                           JSAMPIMAGE output_buf, JDIMENSION output_row,
                           int num_rows)
 {
-  my_cconvert_ptr cconvert = (my_cconvert_ptr)cinfo->cconvert;
   register int r, g, b;
-  register JLONG *ctab = cconvert->rgb_ycc_tab;
+  register JLONG *ctab = input->rgb_ycc_tab;
   register JSAMPROW inptr;
   register JSAMPROW outptr;
   register JDIMENSION col;
-  JDIMENSION num_cols = cinfo->image_width;
+  JDIMENSION num_cols = input->image_width;
+  JSAMPARRAY input_buf = input->input_buf;
 
   while (--num_rows >= 0) {
     inptr = *input_buf++;
@@ -119,14 +119,15 @@ rgb_gray_convert_internal(j_compress_ptr cinfo, JSAMPARRAY input_buf,
 
 INLINE
 LOCAL(void)
-rgb_rgb_convert_internal(j_compress_ptr cinfo, JSAMPARRAY input_buf,
+rgb_rgb_convert_internal(struct jpeg_color_converter_input *input,
                          JSAMPIMAGE output_buf, JDIMENSION output_row,
                          int num_rows)
 {
   register JSAMPROW inptr;
   register JSAMPROW outptr0, outptr1, outptr2;
   register JDIMENSION col;
-  JDIMENSION num_cols = cinfo->image_width;
+  JDIMENSION num_cols = input->image_width;
+  JSAMPARRAY input_buf = input->input_buf;
 
   while (--num_rows >= 0) {
     inptr = *input_buf++;

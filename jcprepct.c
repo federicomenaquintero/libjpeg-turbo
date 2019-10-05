@@ -117,7 +117,6 @@ expand_bottom_edge(JSAMPARRAY image_data, JDIMENSION num_cols, int input_rows,
   }
 }
 
-
 /*
  * Process some data in the simple no-context case.
  *
@@ -140,11 +139,15 @@ pre_process_data(j_compress_ptr cinfo, JSAMPARRAY input_buf,
 
   while (*in_row_ctr < in_rows_avail &&
          *out_row_group_ctr < out_row_groups_avail) {
+    struct jpeg_color_converter_input input;
+      
     /* Do color conversion to fill the conversion buffer. */
     inrows = in_rows_avail - *in_row_ctr;
     numrows = cinfo->max_v_samp_factor - prep->next_buf_row;
     numrows = (int)MIN((JDIMENSION)numrows, inrows);
-    (*cinfo->cconvert->color_convert) (cinfo, input_buf + *in_row_ctr,
+
+    input = jinit_converter_input(cinfo, input_buf + *in_row_ctr);
+    (*cinfo->cconvert->color_convert) (&input,
                                        prep->color_buf,
                                        (JDIMENSION)prep->next_buf_row,
                                        numrows);
@@ -204,11 +207,15 @@ pre_process_context(j_compress_ptr cinfo, JSAMPARRAY input_buf,
 
   while (*out_row_group_ctr < out_row_groups_avail) {
     if (*in_row_ctr < in_rows_avail) {
+      struct jpeg_color_converter_input input;
+
       /* Do color conversion to fill the conversion buffer. */
       inrows = in_rows_avail - *in_row_ctr;
       numrows = prep->next_buf_stop - prep->next_buf_row;
       numrows = (int)MIN((JDIMENSION)numrows, inrows);
-      (*cinfo->cconvert->color_convert) (cinfo, input_buf + *in_row_ctr,
+
+      input = jinit_converter_input(cinfo, input_buf + *in_row_ctr);
+      (*cinfo->cconvert->color_convert) (&input,
                                          prep->color_buf,
                                          (JDIMENSION)prep->next_buf_row,
                                          numrows);
