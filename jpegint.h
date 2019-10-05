@@ -93,11 +93,13 @@ struct jpeg_c_coef_controller {
 };
 
 /* Colorspace conversion */
+typedef void (* jpeg_color_convert_fn) (j_compress_ptr cinfo, JSAMPARRAY input_buf,
+					JSAMPIMAGE output_buf, JDIMENSION output_row,
+					int num_rows);
+
 struct jpeg_color_converter {
   void (*start_pass) (j_compress_ptr cinfo);
-  void (*color_convert) (j_compress_ptr cinfo, JSAMPARRAY input_buf,
-                         JSAMPIMAGE output_buf, JDIMENSION output_row,
-                         int num_rows);
+  jpeg_color_convert_fn color_convert;
 };
 
 /* Downsampling */
@@ -254,11 +256,12 @@ struct jpeg_upsampler {
 };
 
 /* Colorspace conversion */
+typedef void (* jpeg_color_deconvert_fn) (j_decompress_ptr cinfo, JSAMPIMAGE input_buf,
+					  JDIMENSION input_row, JSAMPARRAY output_buf,
+					  int num_rows);
 struct jpeg_color_deconverter {
   void (*start_pass) (j_decompress_ptr cinfo);
-  void (*color_convert) (j_decompress_ptr cinfo, JSAMPIMAGE input_buf,
-                         JDIMENSION input_row, JSAMPARRAY output_buf,
-                         int num_rows);
+  jpeg_color_deconvert_fn color_convert;
 };
 
 /* Color quantization or color precision reduction */
