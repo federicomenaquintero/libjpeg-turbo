@@ -331,6 +331,9 @@ struct jpeg_color_quantizer {
 #endif  /* !__GNUC__ */
 
 
+EXTERN(void) jabort_error(const char *func, const char *msg, ...) J_GNUC_PRINTF(2, 3)
+  J_GNUC_NORETURN;
+
 EXTERN(void) jabort_bad_state(const char *func, int state) J_GNUC_NORETURN;
 
 /* Compression module initialization routines */

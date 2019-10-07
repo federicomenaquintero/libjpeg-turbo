@@ -24,6 +24,7 @@
  */
 
 /* this is not a core library module, so it doesn't define JPEG_INTERNALS */
+#include <stdarg.h>
 #include "jinclude.h"
 #include "jpeglib.h"
 #include "jversion.h"
@@ -54,6 +55,23 @@ const char * const jpeg_std_message_table[] = {
 };
 
 
+/*
+ * Prints a message to stderr and aborts the program.
+ *
+ * Use this when detecting programming errors that cannot be recovered.
+ */
+GLOBAL(void)
+jabort_error(const char *func, const char *msg, ...)
+{
+  va_list args;
+
+  va_start(args, msg);
+  fprintf(stderr, "%s: ", func);
+  vfprintf(stderr, msg, args);
+  fprintf(stderr, "\n");
+  va_end(args);
+  abort();
+}
 
 /*
  * Aborts the program when the library is called in an improper state.
