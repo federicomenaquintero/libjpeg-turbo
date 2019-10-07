@@ -39,11 +39,19 @@ jpeg_CreateDecompress(j_decompress_ptr cinfo, int version, size_t structsize)
 
   /* Guard against version mismatches between library and caller. */
   cinfo->mem = NULL;            /* so jpeg_destroy knows mem mgr not called */
-  if (version != JPEG_LIB_VERSION)
-    ERREXIT2(cinfo, JERR_BAD_LIB_VERSION, JPEG_LIB_VERSION, version);
-  if (structsize != sizeof(struct jpeg_decompress_struct))
-    ERREXIT2(cinfo, JERR_BAD_STRUCT_SIZE,
-             (int)sizeof(struct jpeg_decompress_struct), (int)structsize);
+  if (version != JPEG_LIB_VERSION) {
+    /* JERR_BAD_LIB_VERSION */
+    jabort_error("jpeg_CreateDecompress",
+                 "Wrong JPEG library version: library is %d, caller expects %d",
+                 JPEG_LIB_VERSION, version);
+  }
+
+  if (structsize != sizeof(struct jpeg_decompress_struct)) {
+    /* JERR_BAD_STRUCT_SIZE */
+    jabort_error("jpeg_CreateDecompress",
+                 "JPEG parameter struct mismatch: library thinks size is %u, caller expects %u",
+                 (int)sizeof(struct jpeg_decompress_struct), (int)structsize);
+  }
 
   /* For debugging purposes, we zero the whole master structure.
    * But the application has already set the err pointer, and may have set
