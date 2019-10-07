@@ -302,6 +302,35 @@ struct jpeg_color_quantizer {
 #define RIGHT_SHIFT(x, shft)    ((x) >> (shft))
 #endif
 
+#ifdef __GNUC__
+#define J_GNUC_CHECK_VERSION(major, minor) \
+    ((__GNUC__ > (major)) || \
+     ((__GNUC__ == (major)) && \
+      (__GNUC_MINOR__ >= (minor))))
+#else
+#define J_GNUC_CHECK_VERSION(major, minor) 0
+#endif
+
+#if     __GNUC__ > 2 || (__GNUC__ == 2 && __GNUC_MINOR__ > 4)
+#if !defined (__clang__) && J_GNUC_CHECK_VERSION (4, 4)
+#define J_GNUC_PRINTF( format_idx, arg_idx )    \
+  __attribute__((__format__ (gnu_printf, format_idx, arg_idx)))
+#else
+#define J_GNUC_PRINTF( format_idx, arg_idx )    \
+  __attribute__((__format__ (__printf__, format_idx, arg_idx)))
+#endif
+#define J_GNUC_NORETURN                         \
+  __attribute__((__noreturn__))
+#else   /* !__GNUC__ */
+#define J_GNUC_PRINTF( format_idx, arg_idx )
+/* NOTE: MSVC has __declspec(noreturn) but unlike GCC __attribute__,
+ * __declspec can only be placed at the start of the function prototype
+ * and not at the end, so we can't use it without breaking API.
+ */
+#define J_GNUC_NORETURN
+#endif  /* !__GNUC__ */
+
+
 EXTERN(void) jabort_bad_state(const char *func, int state);
 
 /* Compression module initialization routines */
