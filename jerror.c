@@ -88,6 +88,34 @@ jabort_bad_state(const char *func, int state)
   abort();
 }
 
+/* Implements the very first sanity check for the API entry points;
+ * the library version number used by the compiled application's headers
+ * and its struct size for jpeg_compress_struct/jpeg_decompress_struct must
+ * match the library's.
+ *
+ * Will abort() if the checks fail; this probably means that the application is
+ * linked to the wrong library.
+ */
+GLOBAL(void)
+jcheck_version_and_struct_size(const char *entry_point,
+                               int version, size_t structsize,
+                               size_t expected_struct_size)
+{
+  if (version != JPEG_LIB_VERSION) {
+    /* JERR_BAD_LIB_VERSION */
+    jabort_error("jpeg_CreateDecompress",
+                 "Wrong JPEG library version: library is %d, caller expects %d",
+                 JPEG_LIB_VERSION, version);
+  }
+
+  if (structsize != expected_struct_size) {
+    /* JERR_BAD_STRUCT_SIZE */
+    jabort_error("jpeg_CreateDecompress",
+                 "JPEG parameter struct mismatch: library thinks size is %u, caller expects %u",
+                 (int)sizeof(struct jpeg_decompress_struct), (int)structsize);
+  }
+}
+
 /*
  * Error exit handler: must not return to caller.
  *

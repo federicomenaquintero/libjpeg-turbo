@@ -336,6 +336,10 @@ EXTERN(void) jabort_error(const char *func, const char *msg, ...) J_GNUC_PRINTF(
 
 EXTERN(void) jabort_bad_state(const char *func, int state) J_GNUC_NORETURN;
 
+EXTERN(void) jcheck_version_and_struct_size(const char *entry_point,
+					    int version, size_t structsize,
+					    size_t expected_struct_size);
+
 /* Compression module initialization routines */
 EXTERN(void) jinit_compress_master(j_compress_ptr cinfo);
 EXTERN(void) jinit_c_master_control(j_compress_ptr cinfo,
