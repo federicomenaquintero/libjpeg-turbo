@@ -1,3 +1,5 @@
+/* -*- Mode: C; indent-tabs-mode: nil; c-basic-offset: 2 -*- */
+/* vim: set sw=2 sts=2 expandtab: */
 /*
  * Copyright (C)2009-2019 D. R. Commander.  All Rights Reserved.
  *

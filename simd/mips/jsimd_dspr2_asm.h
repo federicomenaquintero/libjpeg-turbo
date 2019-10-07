@@ -1,3 +1,5 @@
+/* -*- Mode: C; indent-tabs-mode: nil; c-basic-offset: 2 -*- */
+/* vim: set sw=2 sts=2 expandtab: */
 /*
  * MIPS DSPr2 optimizations for libjpeg-turbo
  *

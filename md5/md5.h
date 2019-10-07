@@ -1,3 +1,5 @@
+/* -*- Mode: C; indent-tabs-mode: nil; c-basic-offset: 2 -*- */
+/* vim: set sw=2 sts=2 expandtab: */
 /*
  * libjpeg-turbo Modifications:
  * Copyright (C)2018 D. R. Commander.  All Rights Reserved.
