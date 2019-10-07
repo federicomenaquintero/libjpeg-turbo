@@ -48,6 +48,7 @@
 #include <sys/types.h>
 #endif
 
+#include <assert.h>
 #include <stdio.h>
 
 /*
