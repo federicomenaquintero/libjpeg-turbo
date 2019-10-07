@@ -1103,8 +1103,12 @@ jinit_memory_mgr(j_common_ptr cinfo)
    * in common if and only if X is a power of 2, ie has only one one-bit.
    * Some compilers may give an "unreachable code" warning here; ignore it.
    */
-  if ((ALIGN_SIZE & (ALIGN_SIZE - 1)) != 0)
-    ERREXIT(cinfo, JERR_BAD_ALIGN_TYPE);
+  if ((ALIGN_SIZE & (ALIGN_SIZE - 1)) != 0) {
+    /* JERR_BAD_ALIGN_TYPE */
+    jabort_error("jinit_memory_mgr",
+                 "ALIGN_TYPE is wrong, please fix");
+  }
+
   /* MAX_ALLOC_CHUNK must be representable as type size_t, and must be
    * a multiple of ALIGN_SIZE.
    * Again, an "unreachable code" warning may be ignored here.
@@ -1112,8 +1116,11 @@ jinit_memory_mgr(j_common_ptr cinfo)
    */
   test_mac = (size_t)MAX_ALLOC_CHUNK;
   if ((long)test_mac != MAX_ALLOC_CHUNK ||
-      (MAX_ALLOC_CHUNK % ALIGN_SIZE) != 0)
-    ERREXIT(cinfo, JERR_BAD_ALLOC_CHUNK);
+      (MAX_ALLOC_CHUNK % ALIGN_SIZE) != 0) {
+    /* JERR_BAD_ALLOC_CHUNK */
+    jabort_error("jinit_memory_mgr",
+                 "MAX_ALLOC_CHUNK is wrong, please fix");
+  }
 
   max_to_use = jpeg_mem_init(cinfo); /* system-dependent initialization */
 
