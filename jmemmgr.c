@@ -274,6 +274,8 @@ alloc_small(j_common_ptr cinfo, int pool_id, size_t sizeofobject)
   char *data_ptr;
   size_t min_request, slop;
 
+  assert(pool_id >= 0 && pool_id < JPOOL_NUMPOOLS); /* JERR_BAD_POOL_ID */
+
   /*
    * Round up the requested size to a multiple of ALIGN_SIZE in order
    * to assure alignment for the next object allocated in the same pool
@@ -293,8 +295,7 @@ alloc_small(j_common_ptr cinfo, int pool_id, size_t sizeofobject)
     out_of_memory(cinfo, 1);    /* request exceeds malloc's ability */
 
   /* See if space is available in any existing pool */
-  if (pool_id < 0 || pool_id >= JPOOL_NUMPOOLS)
-    ERREXIT1(cinfo, JERR_BAD_POOL_ID, pool_id); /* safety check */
+
   prev_hdr_ptr = NULL;
   hdr_ptr = mem->small_list[pool_id];
   while (hdr_ptr != NULL) {
@@ -369,6 +370,8 @@ alloc_large(j_common_ptr cinfo, int pool_id, size_t sizeofobject)
   large_pool_ptr hdr_ptr;
   char *data_ptr;
 
+  assert(pool_id >= 0 && pool_id < JPOOL_NUMPOOLS); /* JERR_BAD_POOL_ID */
+
   /*
    * Round up the requested size to a multiple of ALIGN_SIZE so that
    * algorithms can straddle outside the proper area up to the next
@@ -387,8 +390,6 @@ alloc_large(j_common_ptr cinfo, int pool_id, size_t sizeofobject)
     out_of_memory(cinfo, 3);    /* request exceeds malloc's ability */
 
   /* Always make a new pool */
-  if (pool_id < 0 || pool_id >= JPOOL_NUMPOOLS)
-    ERREXIT1(cinfo, JERR_BAD_POOL_ID, pool_id); /* safety check */
 
   hdr_ptr = (large_pool_ptr)jpeg_get_large(cinfo, sizeofobject +
                                            sizeof(large_pool_hdr) +
@@ -586,8 +587,7 @@ request_virt_sarray(j_common_ptr cinfo, int pool_id, boolean pre_zero,
   jvirt_sarray_ptr result;
 
   /* Only IMAGE-lifetime virtual arrays are currently supported */
-  if (pool_id != JPOOL_IMAGE)
-    ERREXIT1(cinfo, JERR_BAD_POOL_ID, pool_id); /* safety check */
+  assert(pool_id == JPOOL_IMAGE); /* JERR_BAD_POOL_ID */
 
   /* get control block */
   result = (jvirt_sarray_ptr)alloc_small(cinfo, pool_id,
@@ -616,8 +616,7 @@ request_virt_barray(j_common_ptr cinfo, int pool_id, boolean pre_zero,
   jvirt_barray_ptr result;
 
   /* Only IMAGE-lifetime virtual arrays are currently supported */
-  if (pool_id != JPOOL_IMAGE)
-    ERREXIT1(cinfo, JERR_BAD_POOL_ID, pool_id); /* safety check */
+  assert(pool_id == JPOOL_IMAGE); /* JERR_BAD_POOL_ID */
 
   /* get control block */
   result = (jvirt_barray_ptr)alloc_small(cinfo, pool_id,
@@ -828,15 +827,14 @@ access_virt_sarray(j_common_ptr cinfo, jvirt_sarray_ptr ptr,
   JDIMENSION undef_row;
 
   /* debugging check */
-  if (end_row > ptr->rows_in_array || num_rows > ptr->maxaccess ||
-      ptr->mem_buffer == NULL)
-    ERREXIT(cinfo, JERR_BAD_VIRTUAL_ACCESS);
+  assert(end_row <= ptr->rows_in_array && num_rows <= ptr->maxaccess &&
+         ptr->mem_buffer != NULL); /* JERR_BAD_VIRTUAL_ACCESS */
 
   /* Make the desired part of the virtual array accessible */
   if (start_row < ptr->cur_start_row ||
       end_row > ptr->cur_start_row + ptr->rows_in_mem) {
-    if (!ptr->b_s_open)
-      ERREXIT(cinfo, JERR_VIRTUAL_BUG);
+    assert(ptr->b_s_open); /* JERR_VIRTUAL_BUG */
+
     /* Flush old buffer contents if necessary */
     if (ptr->dirty) {
       do_sarray_io(cinfo, ptr, TRUE);
@@ -872,8 +870,8 @@ access_virt_sarray(j_common_ptr cinfo, jvirt_sarray_ptr ptr,
    */
   if (ptr->first_undef_row < end_row) {
     if (ptr->first_undef_row < start_row) {
-      if (writable)             /* writer skipped over a section of array */
-        ERREXIT(cinfo, JERR_BAD_VIRTUAL_ACCESS);
+      assert(!writable); /* JERR_BAD_VIRTUAL_ACCESS; writer skipped over a section of array */
+
       undef_row = start_row;    /* but reader is allowed to read ahead */
     } else {
       undef_row = ptr->first_undef_row;
@@ -889,8 +887,7 @@ access_virt_sarray(j_common_ptr cinfo, jvirt_sarray_ptr ptr,
         undef_row++;
       }
     } else {
-      if (!writable)            /* reader looking at undefined data */
-        ERREXIT(cinfo, JERR_BAD_VIRTUAL_ACCESS);
+      assert(writable); /* JERR_BAD_VIRTUAL_ACCESS; reader looking at undefined data */
     }
   }
   /* Flag the buffer dirty if caller will write in it */
@@ -912,15 +909,14 @@ access_virt_barray(j_common_ptr cinfo, jvirt_barray_ptr ptr,
   JDIMENSION undef_row;
 
   /* debugging check */
-  if (end_row > ptr->rows_in_array || num_rows > ptr->maxaccess ||
-      ptr->mem_buffer == NULL)
-    ERREXIT(cinfo, JERR_BAD_VIRTUAL_ACCESS);
+  assert(end_row <= ptr->rows_in_array && num_rows <= ptr->maxaccess &&
+         ptr->mem_buffer != NULL); /* JERR_BAD_VIRTUAL_ACCESS */
 
   /* Make the desired part of the virtual array accessible */
   if (start_row < ptr->cur_start_row ||
       end_row > ptr->cur_start_row + ptr->rows_in_mem) {
-    if (!ptr->b_s_open)
-      ERREXIT(cinfo, JERR_VIRTUAL_BUG);
+    assert(ptr->b_s_open); /* JERR_VIRTUAL_BUG */
+
     /* Flush old buffer contents if necessary */
     if (ptr->dirty) {
       do_barray_io(cinfo, ptr, TRUE);
@@ -956,8 +952,8 @@ access_virt_barray(j_common_ptr cinfo, jvirt_barray_ptr ptr,
    */
   if (ptr->first_undef_row < end_row) {
     if (ptr->first_undef_row < start_row) {
-      if (writable)             /* writer skipped over a section of array */
-        ERREXIT(cinfo, JERR_BAD_VIRTUAL_ACCESS);
+      assert(!writable); /* JERR_BAD_VIRTUAL_ACCESS; writer skipped over a section of array */
+
       undef_row = start_row;    /* but reader is allowed to read ahead */
     } else {
       undef_row = ptr->first_undef_row;
@@ -973,8 +969,7 @@ access_virt_barray(j_common_ptr cinfo, jvirt_barray_ptr ptr,
         undef_row++;
       }
     } else {
-      if (!writable)            /* reader looking at undefined data */
-        ERREXIT(cinfo, JERR_BAD_VIRTUAL_ACCESS);
+      assert(writable); /* JERR_BAD_VIRTUAL_ACCESS; reader looking at undefined data */
     }
   }
   /* Flag the buffer dirty if caller will write in it */
@@ -997,8 +992,7 @@ free_pool(j_common_ptr cinfo, int pool_id)
   large_pool_ptr lhdr_ptr;
   size_t space_freed;
 
-  if (pool_id < 0 || pool_id >= JPOOL_NUMPOOLS)
-    ERREXIT1(cinfo, JERR_BAD_POOL_ID, pool_id); /* safety check */
+  assert(pool_id >= 0 && pool_id < JPOOL_NUMPOOLS); /* JERR_BAD_POOL_ID */
 
 #ifdef MEM_STATS
   if (cinfo->err->trace_level > 1)
