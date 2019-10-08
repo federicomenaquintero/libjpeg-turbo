@@ -213,6 +213,7 @@ select_ncolors(j_decompress_ptr cinfo, int Ncolors[])
   iroot--;                      /* now iroot = floor(root) */
 
   /* Must have at least 2 color values per component */
+  /* FMQ: this should be a non-fatal argument check */
   if (iroot < 2)
     ERREXIT1(cinfo, JERR_QUANT_FEW_COLORS, (int)temp);
 
@@ -789,7 +790,10 @@ start_pass_1_quant(j_decompress_ptr cinfo, boolean is_pre_scan)
       jzero_far((void *)cquantize->fserrors[i], arraysize);
     break;
   default:
-    ERREXIT(cinfo, JERR_NOT_COMPILED);
+    /* FMQ: this should be a very early argument check during the quantization process;
+     * it is just (cinfo->dither_mode >= JDITHER_NONE && cinfo->dither_mode <= JDITHER_FS)
+     */
+    assert(false); /* JERR_NOT_COMPILED */
     break;
   }
 }
@@ -814,7 +818,7 @@ finish_pass_1_quant(j_decompress_ptr cinfo)
 METHODDEF(void)
 new_color_map_1_quant(j_decompress_ptr cinfo)
 {
-  ERREXIT(cinfo, JERR_MODE_CHANGE);
+  assert(false); /* JERR_MODE_CHANGE */
 }
 
 
@@ -838,11 +842,11 @@ jinit_1pass_quantizer(j_decompress_ptr cinfo)
   cquantize->odither[0] = NULL; /* Also flag odither arrays not allocated */
 
   /* Make sure my internal arrays won't overflow */
-  if (cinfo->out_color_components > MAX_Q_COMPS)
-    ERREXIT1(cinfo, JERR_QUANT_COMPONENTS, MAX_Q_COMPS);
+  assert(cinfo->out_color_components <= MAX_Q_COMPS); /* JERR_QUANT_COMPONENTS */
+
   /* Make sure colormap indexes can be represented by JSAMPLEs */
-  if (cinfo->desired_number_of_colors > (MAXJSAMPLE + 1))
-    ERREXIT1(cinfo, JERR_QUANT_MANY_COLORS, MAXJSAMPLE + 1);
+  /* FMQ: this is an argument check; move it earlier in the code? */
+  assert(cinfo->desired_number_of_colors <= (MAXJSAMPLE + 1)); /* JERR_QUANT_MANY_COLORS */
 
   /* Create the colormap and color index table. */
   create_colormap(cinfo);
