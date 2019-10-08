@@ -114,6 +114,7 @@ transdecode_master_selection(j_decompress_ptr cinfo)
 #ifdef D_ARITH_CODING_SUPPORTED
     jinit_arith_decoder(cinfo);
 #else
+    /* FMQ: should be a non-fatal argument check; return not-implemented */
     ERREXIT(cinfo, JERR_ARITH_NOTIMPL);
 #endif
   } else {
@@ -121,6 +122,7 @@ transdecode_master_selection(j_decompress_ptr cinfo)
 #ifdef D_PROGRESSIVE_SUPPORTED
       jinit_phuff_decoder(cinfo);
 #else
+      /* FMQ: should be a non-fatal argument check; return not-implemented */
       ERREXIT(cinfo, JERR_NOT_COMPILED);
 #endif
     } else
