@@ -20,9 +20,9 @@
  * than 8 bits on your machine, you may need to do some tweaking.
  */
 
-/* this is not a core library module, so it doesn't define JPEG_INTERNALS */
 #include "jinclude.h"
 #include "jpeglib.h"
+#include "jpegint.h"
 #include "jerror.h"
 
 #ifndef HAVE_STDLIB_H           /* <stdlib.h> should declare malloc(),free() */
@@ -119,8 +119,10 @@ empty_output_buffer(j_compress_ptr cinfo)
   my_dest_ptr dest = (my_dest_ptr)cinfo->dest;
 
   if (JFWRITE(dest->outfile, dest->buffer, OUTPUT_BUF_SIZE) !=
-      (size_t)OUTPUT_BUF_SIZE)
+      (size_t)OUTPUT_BUF_SIZE) {
+    /* FMQ: set permanent error */
     ERREXIT(cinfo, JERR_FILE_WRITE);
+  }
 
   dest->pub.next_output_byte = dest->buffer;
   dest->pub.free_in_buffer = OUTPUT_BUF_SIZE;
@@ -140,8 +142,10 @@ empty_mem_output_buffer(j_compress_ptr cinfo)
   nextsize = dest->bufsize * 2;
   nextbuffer = (JOCTET *)malloc(nextsize);
 
-  if (nextbuffer == NULL)
+  if (nextbuffer == NULL) {
+    /* FMQ: set permanent error */
     ERREXIT1(cinfo, JERR_OUT_OF_MEMORY, 10);
+  }
 
   MEMCOPY(nextbuffer, dest->buffer, dest->bufsize);
 
@@ -178,13 +182,17 @@ term_destination(j_compress_ptr cinfo)
 
   /* Write any data remaining in the buffer */
   if (datacount > 0) {
-    if (JFWRITE(dest->outfile, dest->buffer, datacount) != datacount)
+    if (JFWRITE(dest->outfile, dest->buffer, datacount) != datacount) {
+      /* FMQ: set permanent error */
       ERREXIT(cinfo, JERR_FILE_WRITE);
+    }
   }
   fflush(dest->outfile);
   /* Make sure we wrote the output file OK */
-  if (ferror(dest->outfile))
+  if (ferror(dest->outfile)) {
+    /* FMQ: set permanent error */
     ERREXIT(cinfo, JERR_FILE_WRITE);
+  }
 }
 
 #if JPEG_LIB_VERSION >= 80 || defined(MEM_SRCDST_SUPPORTED)
@@ -224,7 +232,10 @@ jpeg_stdio_dest(j_compress_ptr cinfo, FILE *outfile)
      * new structure, but the old structure would not be freed until
      * jpeg_destroy_compress() was called.
      */
-    ERREXIT(cinfo, JERR_BUFFER_SIZE);
+    /* FMQ: this said ERREXIT(cinfo, JERR_BUFFER_SIZE) but that error message doesn't
+     * match the description above; I've take then liberty to change it.
+     */
+    jabort_error("jpeg_stdio_dest", "It is unsafe to reuse the existing destination manager");
   }
 
   dest = (my_dest_ptr)cinfo->dest;
@@ -256,8 +267,7 @@ jpeg_mem_dest(j_compress_ptr cinfo, unsigned char **outbuffer,
 {
   my_mem_dest_ptr dest;
 
-  if (outbuffer == NULL || outsize == NULL)     /* sanity check */
-    ERREXIT(cinfo, JERR_BUFFER_SIZE);
+  assert(outbuffer != NULL && outsize != NULL); /* JERR_BUFFER_SIZE */
 
   /* The destination object is made permanent so that multiple JPEG images
    * can be written to the same buffer without re-executing jpeg_mem_dest.
@@ -270,7 +280,10 @@ jpeg_mem_dest(j_compress_ptr cinfo, unsigned char **outbuffer,
     /* It is unsafe to reuse the existing destination manager unless it was
      * created by this function.
      */
-    ERREXIT(cinfo, JERR_BUFFER_SIZE);
+    /* FMQ: this said ERREXIT(cinfo, JERR_BUFFER_SIZE) but that error message doesn't
+     * match the description above; I've take then liberty to change it.
+     */
+    jabort_error("jpeg_stdio_dest", "It is unsafe to reuse the existing destination manager");
   }
 
   dest = (my_mem_dest_ptr)cinfo->dest;
@@ -284,8 +297,10 @@ jpeg_mem_dest(j_compress_ptr cinfo, unsigned char **outbuffer,
   if (*outbuffer == NULL || *outsize == 0) {
     /* Allocate initial buffer */
     dest->newbuffer = *outbuffer = (unsigned char *)malloc(OUTPUT_BUF_SIZE);
-    if (dest->newbuffer == NULL)
+    if (dest->newbuffer == NULL) {
+      /* FMQ: set permanent error */
       ERREXIT1(cinfo, JERR_OUT_OF_MEMORY, 10);
+    }
     *outsize = OUTPUT_BUF_SIZE;
   }
 
