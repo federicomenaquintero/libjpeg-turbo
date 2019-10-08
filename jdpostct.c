@@ -106,19 +106,17 @@ start_pass_dpost(j_decompress_ptr cinfo, J_BUF_MODE pass_mode)
 #ifdef QUANT_2PASS_SUPPORTED
   case JBUF_SAVE_AND_PASS:
     /* First pass of 2-pass quantization */
-    if (post->whole_image == NULL)
-      ERREXIT(cinfo, JERR_BAD_BUFFER_MODE);
+    assert(post->whole_image != NULL); /* JERR_BAD_BUFFER_MODE */
     post->pub.post_process_data = post_process_prepass;
     break;
   case JBUF_CRANK_DEST:
     /* Second pass of 2-pass quantization */
-    if (post->whole_image == NULL)
-      ERREXIT(cinfo, JERR_BAD_BUFFER_MODE);
+    assert(post->whole_image != NULL); /* JERR_BAD_BUFFER_MODE */
     post->pub.post_process_data = post_process_2pass;
     break;
 #endif /* QUANT_2PASS_SUPPORTED */
   default:
-    ERREXIT(cinfo, JERR_BAD_BUFFER_MODE);
+    assert(false); /* JERR_BAD_BUFFER_MODE */
     break;
   }
   post->starting_row = post->next_row = 0;
@@ -283,7 +281,7 @@ jinit_d_post_controller(j_decompress_ptr cinfo, boolean need_full_buffer)
                                (long)post->strip_height),
          post->strip_height);
 #else
-      ERREXIT(cinfo, JERR_BAD_BUFFER_MODE);
+      assert(false); /* JERR_BAD_BUFFER_MODE */
 #endif /* QUANT_2PASS_SUPPORTED */
     } else {
       /* One-pass color quantization: just make a strip buffer. */
