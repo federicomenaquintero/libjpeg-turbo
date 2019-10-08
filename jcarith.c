@@ -128,8 +128,10 @@ emit_byte(int val, j_compress_ptr cinfo)
 
   *dest->next_output_byte++ = (JOCTET)val;
   if (--dest->free_in_buffer == 0)
-    if (!(*dest->empty_output_buffer) (cinfo))
+    if (!(*dest->empty_output_buffer) (cinfo)) {
+      /* FMQ: permanent error, along the lines of "unimplemented, can't suspend" */
       ERREXIT(cinfo, JERR_CANT_SUSPEND);
+    }
 }
 
 
@@ -833,12 +835,13 @@ start_pass(j_compress_ptr cinfo, boolean gather_statistics)
   int ci, tbl;
   jpeg_component_info *compptr;
 
-  if (gather_statistics)
+  if (gather_statistics) {
     /* Make sure to avoid that in the master control logic!
      * We are fully adaptive here and need no extra
      * statistics gathering pass!
      */
-    ERREXIT(cinfo, JERR_NOT_COMPILED);
+    assert(false); /* JERR_NOT_COMPILED */
+  }
 
   /* We assume jcmaster.c already validated the progressive scan parameters. */
 
@@ -864,8 +867,7 @@ start_pass(j_compress_ptr cinfo, boolean gather_statistics)
     /* DC needs no table for refinement scan */
     if (cinfo->progressive_mode == 0 || (cinfo->Ss == 0 && cinfo->Ah == 0)) {
       tbl = compptr->dc_tbl_no;
-      if (tbl < 0 || tbl >= NUM_ARITH_TBLS)
-        ERREXIT1(cinfo, JERR_NO_ARITH_TABLE, tbl);
+      assert(tbl >= 0 && tbl < NUM_ARITH_TBLS); /* JERR_NO_ARITH_TABLE */
       if (entropy->dc_stats[tbl] == NULL)
         entropy->dc_stats[tbl] = (unsigned char *)(*cinfo->mem->alloc_small)
           ((j_common_ptr)cinfo, JPOOL_IMAGE, DC_STAT_BINS);
@@ -877,8 +879,7 @@ start_pass(j_compress_ptr cinfo, boolean gather_statistics)
     /* AC needs no table when not present */
     if (cinfo->progressive_mode == 0 || cinfo->Se) {
       tbl = compptr->ac_tbl_no;
-      if (tbl < 0 || tbl >= NUM_ARITH_TBLS)
-        ERREXIT1(cinfo, JERR_NO_ARITH_TABLE, tbl);
+      assert(tbl >= 0 && tbl < NUM_ARITH_TBLS); /* JERR_NO_ARITH_TABLE */
       if (entropy->ac_stats[tbl] == NULL)
         entropy->ac_stats[tbl] = (unsigned char *)(*cinfo->mem->alloc_small)
           ((j_common_ptr)cinfo, JPOOL_IMAGE, AC_STAT_BINS);
