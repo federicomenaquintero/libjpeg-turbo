@@ -167,8 +167,10 @@ jpeg_finish_compress(j_compress_ptr cinfo)
   if (cinfo->global_state == CSTATE_SCANNING ||
       cinfo->global_state == CSTATE_RAW_OK) {
     /* Terminate first pass */
-    if (cinfo->next_scanline < cinfo->image_height)
+    if (cinfo->next_scanline < cinfo->image_height) {
+      /* FMQ: permanent error, short file */
       ERREXIT(cinfo, JERR_TOO_LITTLE_DATA);
+    }
     (*cinfo->master->finish_pass) (cinfo);
   } else if (cinfo->global_state != CSTATE_WRCOEFS)
     jabort_bad_state("jpeg_finish_compress", cinfo->global_state);
@@ -184,8 +186,10 @@ jpeg_finish_compress(j_compress_ptr cinfo)
       /* We bypass the main controller and invoke coef controller directly;
        * all work is being done from the coefficient buffer.
        */
-      if (!(*cinfo->coef->compress_data) (cinfo, (JSAMPIMAGE)NULL))
+      if (!(*cinfo->coef->compress_data) (cinfo, (JSAMPIMAGE)NULL)) {
+        /* FMQ: permanent error, can't suspend / unimplemented / short file? */
         ERREXIT(cinfo, JERR_CANT_SUSPEND);
+      }
     }
     (*cinfo->master->finish_pass) (cinfo);
   }
