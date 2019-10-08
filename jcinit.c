@@ -48,14 +48,16 @@ jinit_compress_master(j_compress_ptr cinfo)
 #ifdef C_ARITH_CODING_SUPPORTED
     jinit_arith_encoder(cinfo);
 #else
-    ERREXIT(cinfo, JERR_ARITH_NOTIMPL);
+    /* JERR_ARITH_NOTIMPL */
+    jabort_error("jinit_compress_master", "Sorry, arithmetic coding is not implemented");
 #endif
   } else {
     if (cinfo->progressive_mode) {
 #ifdef C_PROGRESSIVE_SUPPORTED
       jinit_phuff_encoder(cinfo);
 #else
-      ERREXIT(cinfo, JERR_NOT_COMPILED);
+      /* JERR_NOT_COMPILED */
+      jabort_error("jinit_compress_master", "Requested feature was omitted at compile time");
 #endif
     } else
       jinit_huff_encoder(cinfo);
