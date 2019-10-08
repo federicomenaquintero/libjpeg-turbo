@@ -149,8 +149,7 @@ jpeg_write_raw_data(j_compress_ptr cinfo, JSAMPIMAGE data,
 
   /* Verify that at least one iMCU row has been passed. */
   lines_per_iMCU_row = cinfo->max_v_samp_factor * DCTSIZE;
-  if (num_lines < lines_per_iMCU_row)
-    ERREXIT(cinfo, JERR_BUFFER_SIZE);
+  assert(num_lines >= lines_per_iMCU_row); /* JERR_BUFFER_SIZE */
 
   /* Directly compress the row. */
   if (!(*cinfo->coef->compress_data) (cinfo, data)) {
