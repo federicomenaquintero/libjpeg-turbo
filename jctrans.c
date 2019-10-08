@@ -110,9 +110,8 @@ jpeg_copy_critical_parameters(j_decompress_ptr srcinfo, j_compress_ptr dstinfo)
    * Note we assume jpeg_set_defaults has allocated the dest comp_info array.
    */
   dstinfo->num_components = srcinfo->num_components;
-  if (dstinfo->num_components < 1 || dstinfo->num_components > MAX_COMPONENTS)
-    ERREXIT2(dstinfo, JERR_COMPONENT_COUNT, dstinfo->num_components,
-             MAX_COMPONENTS);
+  assert(dstinfo->num_components >= 1 && dstinfo->num_components <= MAX_COMPONENTS); /* JERR_COMPONENT_COUNT */
+
   for (ci = 0, incomp = srcinfo->comp_info, outcomp = dstinfo->comp_info;
        ci < dstinfo->num_components; ci++, incomp++, outcomp++) {
     outcomp->component_id = incomp->component_id;
@@ -124,15 +123,21 @@ jpeg_copy_critical_parameters(j_decompress_ptr srcinfo, j_compress_ptr dstinfo)
      * IJG encoder currently cannot duplicate this.
      */
     tblno = outcomp->quant_tbl_no;
-    if (tblno < 0 || tblno >= NUM_QUANT_TBLS ||
-        srcinfo->quant_tbl_ptrs[tblno] == NULL)
+    assert(tblno >= 0 && tblno < NUM_QUANT_TBLS);
+    if (srcinfo->quant_tbl_ptrs[tblno] == NULL) {
+      /* FMQ: I think this should be a non-fatal argument check; the srcinfo
+       * got to a state that this doesn't support.
+       */
       ERREXIT1(dstinfo, JERR_NO_QUANT_TABLE, tblno);
+    }
     slot_quant = srcinfo->quant_tbl_ptrs[tblno];
     c_quant = incomp->quant_table;
     if (c_quant != NULL) {
       for (coefi = 0; coefi < DCTSIZE2; coefi++) {
-        if (c_quant->quantval[coefi] != slot_quant->quantval[coefi])
+        if (c_quant->quantval[coefi] != slot_quant->quantval[coefi]){
+          /* FMQ: I think this should be a non-fatal argument check */
           ERREXIT1(dstinfo, JERR_MISMATCHED_QUANT_TABLE, tblno);
+        }
       }
     }
     /* Note: we do not copy the source's Huffman table assignments;
@@ -180,6 +185,7 @@ transencode_master_selection(j_compress_ptr cinfo,
 #ifdef C_ARITH_CODING_SUPPORTED
     jinit_arith_encoder(cinfo);
 #else
+    /* FMQ: should be a non-fatal argument check; return not-implemented */
     ERREXIT(cinfo, JERR_ARITH_NOTIMPL);
 #endif
   } else {
@@ -187,6 +193,7 @@ transencode_master_selection(j_compress_ptr cinfo,
 #ifdef C_PROGRESSIVE_SUPPORTED
       jinit_phuff_encoder(cinfo);
 #else
+      /* FMQ: should be a non-fatal argument check; return not-implemented */
       ERREXIT(cinfo, JERR_NOT_COMPILED);
 #endif
     } else
@@ -270,8 +277,7 @@ start_pass_coef(j_compress_ptr cinfo, J_BUF_MODE pass_mode)
 {
   my_coef_ptr coef = (my_coef_ptr)cinfo->coef;
 
-  if (pass_mode != JBUF_CRANK_DEST)
-    ERREXIT(cinfo, JERR_BAD_BUFFER_MODE);
+  assert(pass_mode == JBUF_CRANK_DEST); /* JERR_BAD_BUFFER_MODE */
 
   coef->iMCU_row_num = 0;
   start_iMCU_row(cinfo);
