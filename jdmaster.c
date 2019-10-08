@@ -474,6 +474,7 @@ master_selection(j_decompress_ptr cinfo)
   samplesperrow = (long)cinfo->output_width *
                   (long)cinfo->out_color_components;
   jd_samplesperrow = (JDIMENSION)samplesperrow;
+  /* FMQ: should be a non-fatal argument check */
   if ((long)jd_samplesperrow != samplesperrow)
     ERREXIT(cinfo, JERR_WIDTH_OVERFLOW);
 
@@ -491,8 +492,9 @@ master_selection(j_decompress_ptr cinfo)
     cinfo->enable_2pass_quant = FALSE;
   }
   if (cinfo->quantize_colors) {
-    if (cinfo->raw_data_out)
-      ERREXIT(cinfo, JERR_NOTIMPL);
+    if (cinfo->raw_data_out) {
+      jabort_error("master_selection", "Not implemented yet"); /* JERR_NOTIMPL */
+    }
     /* 2-pass quantizer only works in 3-component color space. */
     if (cinfo->out_color_components != 3) {
       cinfo->enable_1pass_quant = TRUE;
@@ -512,7 +514,7 @@ master_selection(j_decompress_ptr cinfo)
       jinit_1pass_quantizer(cinfo);
       master->quantizer_1pass = cinfo->cquantize;
 #else
-      ERREXIT(cinfo, JERR_NOT_COMPILED);
+      assert(false); /* JERR_NOT_COMPILED */
 #endif
     }
 
@@ -522,7 +524,7 @@ master_selection(j_decompress_ptr cinfo)
       jinit_2pass_quantizer(cinfo);
       master->quantizer_2pass = cinfo->cquantize;
 #else
-      ERREXIT(cinfo, JERR_NOT_COMPILED);
+      assert(false); /* JERR_NOT_COMPILED */
 #endif
     }
     /* If both quantizers are initialized, the 2-pass one is left active;
@@ -536,7 +538,7 @@ master_selection(j_decompress_ptr cinfo)
 #ifdef UPSAMPLE_MERGING_SUPPORTED
       jinit_merged_upsampler(cinfo); /* does color conversion too */
 #else
-      ERREXIT(cinfo, JERR_NOT_COMPILED);
+      assert(false); /* JERR_NOT_COMPILED */
 #endif
     } else {
       jinit_color_deconverter(cinfo);
@@ -551,14 +553,14 @@ master_selection(j_decompress_ptr cinfo)
 #ifdef D_ARITH_CODING_SUPPORTED
     jinit_arith_decoder(cinfo);
 #else
-    ERREXIT(cinfo, JERR_ARITH_NOTIMPL);
+    assert(false); /* JERR_ARITH_NOTIMPL */
 #endif
   } else {
     if (cinfo->progressive_mode) {
 #ifdef D_PROGRESSIVE_SUPPORTED
       jinit_phuff_decoder(cinfo);
 #else
-      ERREXIT(cinfo, JERR_NOT_COMPILED);
+      assert(false); /* JERR_NOT_COMPILED */
 #endif
     } else
       jinit_huff_decoder(cinfo);
@@ -632,7 +634,7 @@ prepare_for_output_pass(j_decompress_ptr cinfo)
     (*cinfo->post->start_pass) (cinfo, JBUF_CRANK_DEST);
     (*cinfo->main->start_pass) (cinfo, JBUF_CRANK_DEST);
 #else
-    ERREXIT(cinfo, JERR_NOT_COMPILED);
+    assert(false); /* JERR_NOT_COMPILED */
 #endif /* QUANT_2PASS_SUPPORTED */
   } else {
     if (cinfo->quantize_colors && cinfo->colormap == NULL) {
@@ -643,7 +645,8 @@ prepare_for_output_pass(j_decompress_ptr cinfo)
       } else if (cinfo->enable_1pass_quant) {
         cinfo->cquantize = master->quantizer_1pass;
       } else {
-        ERREXIT(cinfo, JERR_MODE_CHANGE);
+        /* JERR_MODE_CHANGE */
+        jabort_error("prepare_for_output_pass", "Invalid color quantization mode change");
       }
     }
     (*cinfo->idct->start_pass) (cinfo);
@@ -713,7 +716,8 @@ jpeg_new_colormap(j_decompress_ptr cinfo)
     (*cinfo->cquantize->new_color_map) (cinfo);
     master->pub.is_dummy_pass = FALSE; /* just in case */
   } else
-    ERREXIT(cinfo, JERR_MODE_CHANGE);
+    /* JERR_MODE_CHANGE */
+    jabort_error("jpeg_new_colormap", "Invalid color quantization mode change");
 }
 
 #endif /* D_MULTISCAN_FILES_SUPPORTED */
