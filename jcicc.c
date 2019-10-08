@@ -55,8 +55,7 @@ jpeg_write_icc_profile(j_compress_ptr cinfo, const JOCTET *icc_data_ptr,
   int cur_marker = 1;           /* per spec, counting starts at 1 */
   unsigned int length;          /* number of bytes to write in this marker */
 
-  if (icc_data_ptr == NULL || icc_data_len == 0)
-    ERREXIT(cinfo, JERR_BUFFER_SIZE);
+  assert(icc_data_ptr != NULL && icc_data_len > 0); /* JERR_BUFFER_SIZE */
   if (cinfo->global_state < CSTATE_SCANNING)
     jabort_bad_state("jpeg_write_icc_profile", cinfo->global_state);
 
