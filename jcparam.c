@@ -44,8 +44,7 @@ jpeg_add_quant_table(j_compress_ptr cinfo, int which_tbl,
   if (cinfo->global_state != CSTATE_START)
     jabort_bad_state("jpeg_add_quant_table", cinfo->global_state);
 
-  if (which_tbl < 0 || which_tbl >= NUM_QUANT_TBLS)
-    ERREXIT1(cinfo, JERR_DQT_INDEX, which_tbl);
+  assert(which_tbl >= 0 && which_tbl < NUM_QUANT_TBLS); /* JERR_DQT_INDEX */
 
   qtblptr = &cinfo->quant_tbl_ptrs[which_tbl];
 
@@ -313,7 +312,7 @@ jpeg_default_colorspace(j_compress_ptr cinfo)
     jpeg_set_colorspace(cinfo, JCS_UNKNOWN);
     break;
   default:
-    ERREXIT(cinfo, JERR_BAD_IN_COLORSPACE);
+    assert(false); /* JERR_BAD_IN_COLORSPACE */
   }
 }
 
@@ -391,15 +390,13 @@ jpeg_set_colorspace(j_compress_ptr cinfo, J_COLOR_SPACE colorspace)
     break;
   case JCS_UNKNOWN:
     cinfo->num_components = cinfo->input_components;
-    if (cinfo->num_components < 1 || cinfo->num_components > MAX_COMPONENTS)
-      ERREXIT2(cinfo, JERR_COMPONENT_COUNT, cinfo->num_components,
-               MAX_COMPONENTS);
+    assert(cinfo->num_components >= 1 && cinfo->num_components <= MAX_COMPONENTS); /* JERR_COMPONENT_COUNT */
     for (ci = 0; ci < cinfo->num_components; ci++) {
       SET_COMP(ci, ci, 1, 1, 0, 0, 0);
     }
     break;
   default:
-    ERREXIT(cinfo, JERR_BAD_J_COLORSPACE);
+    assert(false); /* JERR_BAD_J_COLORSPACE */
   }
 }
 
