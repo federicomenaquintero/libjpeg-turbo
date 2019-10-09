@@ -173,12 +173,10 @@ jpeg_make_d_derived_tbl(j_decompress_ptr cinfo, boolean isDC, int tblno,
    */
 
   /* Find the input Huffman table */
-  if (tblno < 0 || tblno >= NUM_HUFF_TBLS)
-    ERREXIT1(cinfo, JERR_NO_HUFF_TABLE, tblno);
+  assert(tblno >= 0 && tblno < NUM_HUFF_TBLS); /* JERR_NO_HUFF_TABLE */
   htbl =
     isDC ? cinfo->dc_huff_tbl_ptrs[tblno] : cinfo->ac_huff_tbl_ptrs[tblno];
-  if (htbl == NULL)
-    ERREXIT1(cinfo, JERR_NO_HUFF_TABLE, tblno);
+  assert(htbl != NULL); /* JERR_NO_HUFF_TABLE */
 
   /* Allocate a workspace if we haven't already done so. */
   if (*pdtbl == NULL)
@@ -193,8 +191,11 @@ jpeg_make_d_derived_tbl(j_decompress_ptr cinfo, boolean isDC, int tblno,
   p = 0;
   for (l = 1; l <= 16; l++) {
     i = (int)htbl->bits[l];
-    if (i < 0 || p + i > 256)   /* protect against table overrun */
+    if (i < 0 || p + i > 256) {   /* protect against table overrun */
+      /* FMQ: does this come from image data?  If so, permanent error */
       ERREXIT(cinfo, JERR_BAD_HUFF_TABLE);
+    }
+
     while (i--)
       huffsize[p++] = (char)l;
   }
@@ -215,8 +216,10 @@ jpeg_make_d_derived_tbl(j_decompress_ptr cinfo, boolean isDC, int tblno,
     /* code is now 1 more than the last code used for codelength si; but
      * it must still fit in si bits, since no code is allowed to be all ones.
      */
-    if (((JLONG)code) >= (((JLONG)1) << si))
+    if (((JLONG)code) >= (((JLONG)1) << si)) {
+      /* FMQ: does this come from image data?  If so, permanent error */
       ERREXIT(cinfo, JERR_BAD_HUFF_TABLE);
+    }
     code <<= 1;
     si++;
   }
@@ -271,8 +274,10 @@ jpeg_make_d_derived_tbl(j_decompress_ptr cinfo, boolean isDC, int tblno,
   if (isDC) {
     for (i = 0; i < numsymbols; i++) {
       int sym = htbl->huffval[i];
-      if (sym < 0 || sym > 15)
+      if (sym < 0 || sym > 15) {
+        /* FMQ: does this come from image data?  If so, permanent error */
         ERREXIT(cinfo, JERR_BAD_HUFF_TABLE);
+      }
     }
   }
 }
