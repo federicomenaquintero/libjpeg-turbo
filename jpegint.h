@@ -269,7 +269,17 @@ struct jpeg_upsampler {
 };
 
 /* Colorspace conversion */
-typedef void (* jpeg_color_deconvert_fn) (j_decompress_ptr cinfo, JSAMPIMAGE input_buf,
+struct jpeg_color_deconverter_input {
+  int num_components;
+  J_COLOR_SPACE out_color_space;
+  JDIMENSION output_width;
+  JDIMENSION output_scanline;
+  JSAMPLE *sample_range_limit;
+  struct jpeg_color_deconverter *cconvert;
+};
+
+typedef void (* jpeg_color_deconvert_fn) (struct jpeg_color_deconverter_input *input,
+					  JSAMPIMAGE input_buf,
 					  JDIMENSION input_row, JSAMPARRAY output_buf,
 					  int num_rows);
 struct jpeg_color_deconverter {

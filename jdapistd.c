@@ -290,7 +290,8 @@ jpeg_read_scanlines(j_decompress_ptr cinfo, JSAMPARRAY scanlines,
 
 /* Dummy color convert function used by jpeg_skip_scanlines() */
 LOCAL(void)
-noop_convert(j_decompress_ptr cinfo, JSAMPIMAGE input_buf,
+noop_convert(struct jpeg_color_deconverter_input *input,
+	     JSAMPIMAGE input_buf,
              JDIMENSION input_row, JSAMPARRAY output_buf, int num_rows)
 {
 }

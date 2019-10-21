@@ -47,6 +47,19 @@ start_pass_upsample(j_decompress_ptr cinfo)
   upsample->rows_to_go = cinfo->output_height;
 }
 
+LOCAL(struct jpeg_color_deconverter_input)
+init_color_deconverter_input(j_decompress_ptr cinfo)
+{
+  struct jpeg_color_deconverter_input input = { 0, };
+
+  input.num_components = cinfo->num_components;
+  input.out_color_space = cinfo->out_color_space;
+  input.output_width = cinfo->output_width;
+  input.output_scanline = cinfo->output_scanline;
+  input.sample_range_limit = cinfo->sample_range_limit;
+  input.cconvert = cinfo->cconvert;
+  return input;
+}
 
 /*
  * Control routine to do upsampling (and color conversion).
@@ -66,6 +79,7 @@ sep_upsample(j_decompress_ptr cinfo, JSAMPIMAGE input_buf,
   int ci;
   jpeg_component_info *compptr;
   JDIMENSION num_rows;
+  struct jpeg_color_deconverter_input input;
 
   /* Fill the conversion buffer, if it's empty */
   if (upsample->next_row_out >= cinfo->max_v_samp_factor) {
@@ -95,7 +109,8 @@ sep_upsample(j_decompress_ptr cinfo, JSAMPIMAGE input_buf,
   if (num_rows > out_rows_avail)
     num_rows = out_rows_avail;
 
-  (*cinfo->cconvert->color_deconvert) (cinfo, upsample->color_buf,
+  input = init_color_deconverter_input(cinfo);
+  (*cinfo->cconvert->color_deconvert) (&input, upsample->color_buf,
 				       (JDIMENSION)upsample->next_row_out,
 				       output_buf + *out_row_ctr, (int)num_rows);
 

@@ -25,10 +25,10 @@ EXTERN(void) jsimd_rgb_ycc_convert(struct jpeg_color_converter_input *input,
 EXTERN(void) jsimd_rgb_gray_convert(struct jpeg_color_converter_input *input,
                                     JSAMPIMAGE output_buf,
                                     JDIMENSION output_row, int num_rows);
-EXTERN(void) jsimd_ycc_rgb_convert(j_decompress_ptr cinfo,
+EXTERN(void) jsimd_ycc_rgb_convert(struct jpeg_color_deconverter_input *input,
                                    JSAMPIMAGE input_buf, JDIMENSION input_row,
                                    JSAMPARRAY output_buf, int num_rows);
-EXTERN(void) jsimd_ycc_rgb565_convert(j_decompress_ptr cinfo,
+EXTERN(void) jsimd_ycc_rgb565_convert(struct jpeg_color_deconverter_input *input,
                                       JSAMPIMAGE input_buf,
                                       JDIMENSION input_row,
                                       JSAMPARRAY output_buf, int num_rows);

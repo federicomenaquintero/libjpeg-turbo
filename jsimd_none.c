@@ -64,14 +64,16 @@ jsimd_rgb_gray_convert(struct jpeg_color_converter_input *input,
 }
 
 GLOBAL(void)
-jsimd_ycc_rgb_convert(j_decompress_ptr cinfo, JSAMPIMAGE input_buf,
+jsimd_ycc_rgb_convert(struct jpeg_color_deconverter_input *input,
+		      JSAMPIMAGE input_buf,
                       JDIMENSION input_row, JSAMPARRAY output_buf,
                       int num_rows)
 {
 }
 
 GLOBAL(void)
-jsimd_ycc_rgb565_convert(j_decompress_ptr cinfo, JSAMPIMAGE input_buf,
+jsimd_ycc_rgb565_convert(struct jpeg_color_deconverter_input *input,
+			 JSAMPIMAGE input_buf,
                          JDIMENSION input_row, JSAMPARRAY output_buf,
                          int num_rows)
 {

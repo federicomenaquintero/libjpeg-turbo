@@ -251,41 +251,35 @@ build_ycc_rgb_table(j_decompress_ptr cinfo)
  */
 
 METHODDEF(void)
-ycc_rgb_convert(j_decompress_ptr cinfo, JSAMPIMAGE input_buf,
+ycc_rgb_convert(struct jpeg_color_deconverter_input *input,
+		JSAMPIMAGE input_buf,
                 JDIMENSION input_row, JSAMPARRAY output_buf, int num_rows)
 {
-  switch (cinfo->out_color_space) {
+  switch (input->out_color_space) {
   case JCS_EXT_RGB:
-    ycc_extrgb_convert_internal(cinfo, input_buf, input_row, output_buf,
-                                num_rows);
+    ycc_extrgb_convert_internal(input, input_buf, input_row, output_buf, num_rows);
     break;
   case JCS_EXT_RGBX:
   case JCS_EXT_RGBA:
-    ycc_extrgbx_convert_internal(cinfo, input_buf, input_row, output_buf,
-                                 num_rows);
+    ycc_extrgbx_convert_internal(input, input_buf, input_row, output_buf, num_rows);
     break;
   case JCS_EXT_BGR:
-    ycc_extbgr_convert_internal(cinfo, input_buf, input_row, output_buf,
-                                num_rows);
+    ycc_extbgr_convert_internal(input, input_buf, input_row, output_buf, num_rows);
     break;
   case JCS_EXT_BGRX:
   case JCS_EXT_BGRA:
-    ycc_extbgrx_convert_internal(cinfo, input_buf, input_row, output_buf,
-                                 num_rows);
+    ycc_extbgrx_convert_internal(input, input_buf, input_row, output_buf, num_rows);
     break;
   case JCS_EXT_XBGR:
   case JCS_EXT_ABGR:
-    ycc_extxbgr_convert_internal(cinfo, input_buf, input_row, output_buf,
-                                 num_rows);
+    ycc_extxbgr_convert_internal(input, input_buf, input_row, output_buf, num_rows);
     break;
   case JCS_EXT_XRGB:
   case JCS_EXT_ARGB:
-    ycc_extxrgb_convert_internal(cinfo, input_buf, input_row, output_buf,
-                                 num_rows);
+    ycc_extxrgb_convert_internal(input, input_buf, input_row, output_buf, num_rows);
     break;
   default:
-    ycc_rgb_convert_internal(cinfo, input_buf, input_row, output_buf,
-                             num_rows);
+    ycc_rgb_convert_internal(input, input_buf, input_row, output_buf, num_rows);
     break;
   }
 }
@@ -323,16 +317,17 @@ build_rgb_y_table(j_decompress_ptr cinfo)
  */
 
 METHODDEF(void)
-rgb_gray_convert(j_decompress_ptr cinfo, JSAMPIMAGE input_buf,
+rgb_gray_convert(struct jpeg_color_deconverter_input *input,
+		 JSAMPIMAGE input_buf,
                  JDIMENSION input_row, JSAMPARRAY output_buf, int num_rows)
 {
-  my_cconvert_ptr cconvert = (my_cconvert_ptr)cinfo->cconvert;
+  my_cconvert_ptr cconvert = (my_cconvert_ptr)input->cconvert;
   register int r, g, b;
   register JLONG *ctab = cconvert->rgb_y_tab;
   register JSAMPROW outptr;
   register JSAMPROW inptr0, inptr1, inptr2;
   register JDIMENSION col;
-  JDIMENSION num_cols = cinfo->output_width;
+  JDIMENSION num_cols = input->output_width;
 
   while (--num_rows >= 0) {
     inptr0 = input_buf[0][input_row];
@@ -358,13 +353,14 @@ rgb_gray_convert(j_decompress_ptr cinfo, JSAMPIMAGE input_buf,
  */
 
 METHODDEF(void)
-null_convert(j_decompress_ptr cinfo, JSAMPIMAGE input_buf,
+null_convert(struct jpeg_color_deconverter_input *input,
+	     JSAMPIMAGE input_buf,
              JDIMENSION input_row, JSAMPARRAY output_buf, int num_rows)
 {
   register JSAMPROW inptr, inptr0, inptr1, inptr2, inptr3, outptr;
   register JDIMENSION col;
-  register int num_components = cinfo->num_components;
-  JDIMENSION num_cols = cinfo->output_width;
+  register int num_components = input->num_components;
+  JDIMENSION num_cols = input->output_width;
   int ci;
 
   if (num_components == 3) {
@@ -419,11 +415,12 @@ null_convert(j_decompress_ptr cinfo, JSAMPIMAGE input_buf,
  */
 
 METHODDEF(void)
-grayscale_convert(j_decompress_ptr cinfo, JSAMPIMAGE input_buf,
+grayscale_convert(struct jpeg_color_deconverter_input *input,
+		  JSAMPIMAGE input_buf,
                   JDIMENSION input_row, JSAMPARRAY output_buf, int num_rows)
 {
   jcopy_sample_rows(input_buf[0], (int)input_row, output_buf, 0, num_rows,
-                    cinfo->output_width);
+                    input->output_width);
 }
 
 
@@ -432,41 +429,35 @@ grayscale_convert(j_decompress_ptr cinfo, JSAMPIMAGE input_buf,
  */
 
 METHODDEF(void)
-gray_rgb_convert(j_decompress_ptr cinfo, JSAMPIMAGE input_buf,
+gray_rgb_convert(struct jpeg_color_deconverter_input *input,
+		 JSAMPIMAGE input_buf,
                  JDIMENSION input_row, JSAMPARRAY output_buf, int num_rows)
 {
-  switch (cinfo->out_color_space) {
+  switch (input->out_color_space) {
   case JCS_EXT_RGB:
-    gray_extrgb_convert_internal(cinfo, input_buf, input_row, output_buf,
-                                 num_rows);
+    gray_extrgb_convert_internal(input, input_buf, input_row, output_buf, num_rows);
     break;
   case JCS_EXT_RGBX:
   case JCS_EXT_RGBA:
-    gray_extrgbx_convert_internal(cinfo, input_buf, input_row, output_buf,
-                                  num_rows);
+    gray_extrgbx_convert_internal(input, input_buf, input_row, output_buf, num_rows);
     break;
   case JCS_EXT_BGR:
-    gray_extbgr_convert_internal(cinfo, input_buf, input_row, output_buf,
-                                 num_rows);
+    gray_extbgr_convert_internal(input, input_buf, input_row, output_buf, num_rows);
     break;
   case JCS_EXT_BGRX:
   case JCS_EXT_BGRA:
-    gray_extbgrx_convert_internal(cinfo, input_buf, input_row, output_buf,
-                                  num_rows);
+    gray_extbgrx_convert_internal(input, input_buf, input_row, output_buf, num_rows);
     break;
   case JCS_EXT_XBGR:
   case JCS_EXT_ABGR:
-    gray_extxbgr_convert_internal(cinfo, input_buf, input_row, output_buf,
-                                  num_rows);
+    gray_extxbgr_convert_internal(input, input_buf, input_row, output_buf, num_rows);
     break;
   case JCS_EXT_XRGB:
   case JCS_EXT_ARGB:
-    gray_extxrgb_convert_internal(cinfo, input_buf, input_row, output_buf,
-                                  num_rows);
+    gray_extxrgb_convert_internal(input, input_buf, input_row, output_buf, num_rows);
     break;
   default:
-    gray_rgb_convert_internal(cinfo, input_buf, input_row, output_buf,
-                              num_rows);
+    gray_rgb_convert_internal(input, input_buf, input_row, output_buf, num_rows);
     break;
   }
 }
@@ -477,41 +468,35 @@ gray_rgb_convert(j_decompress_ptr cinfo, JSAMPIMAGE input_buf,
  */
 
 METHODDEF(void)
-rgb_rgb_convert(j_decompress_ptr cinfo, JSAMPIMAGE input_buf,
+rgb_rgb_convert(struct jpeg_color_deconverter_input *input,
+		JSAMPIMAGE input_buf,
                 JDIMENSION input_row, JSAMPARRAY output_buf, int num_rows)
 {
-  switch (cinfo->out_color_space) {
+  switch (input->out_color_space) {
   case JCS_EXT_RGB:
-    rgb_extrgb_convert_internal(cinfo, input_buf, input_row, output_buf,
-                                num_rows);
+    rgb_extrgb_convert_internal(input, input_buf, input_row, output_buf, num_rows);
     break;
   case JCS_EXT_RGBX:
   case JCS_EXT_RGBA:
-    rgb_extrgbx_convert_internal(cinfo, input_buf, input_row, output_buf,
-                                 num_rows);
+    rgb_extrgbx_convert_internal(input, input_buf, input_row, output_buf, num_rows);
     break;
   case JCS_EXT_BGR:
-    rgb_extbgr_convert_internal(cinfo, input_buf, input_row, output_buf,
-                                num_rows);
+    rgb_extbgr_convert_internal(input, input_buf, input_row, output_buf, num_rows);
     break;
   case JCS_EXT_BGRX:
   case JCS_EXT_BGRA:
-    rgb_extbgrx_convert_internal(cinfo, input_buf, input_row, output_buf,
-                                 num_rows);
+    rgb_extbgrx_convert_internal(input, input_buf, input_row, output_buf, num_rows);
     break;
   case JCS_EXT_XBGR:
   case JCS_EXT_ABGR:
-    rgb_extxbgr_convert_internal(cinfo, input_buf, input_row, output_buf,
-                                 num_rows);
+    rgb_extxbgr_convert_internal(input, input_buf, input_row, output_buf, num_rows);
     break;
   case JCS_EXT_XRGB:
   case JCS_EXT_ARGB:
-    rgb_extxrgb_convert_internal(cinfo, input_buf, input_row, output_buf,
-                                 num_rows);
+    rgb_extxrgb_convert_internal(input, input_buf, input_row, output_buf, num_rows);
     break;
   default:
-    rgb_rgb_convert_internal(cinfo, input_buf, input_row, output_buf,
-                             num_rows);
+    rgb_rgb_convert_internal(input, input_buf, input_row, output_buf, num_rows);
     break;
   }
 }
@@ -525,17 +510,18 @@ rgb_rgb_convert(j_decompress_ptr cinfo, JSAMPIMAGE input_buf,
  */
 
 METHODDEF(void)
-ycck_cmyk_convert(j_decompress_ptr cinfo, JSAMPIMAGE input_buf,
+ycck_cmyk_convert(struct jpeg_color_deconverter_input *input,
+		  JSAMPIMAGE input_buf,
                   JDIMENSION input_row, JSAMPARRAY output_buf, int num_rows)
 {
-  my_cconvert_ptr cconvert = (my_cconvert_ptr)cinfo->cconvert;
+  my_cconvert_ptr cconvert = (my_cconvert_ptr)input->cconvert;
   register int y, cb, cr;
   register JSAMPROW outptr;
   register JSAMPROW inptr0, inptr1, inptr2, inptr3;
   register JDIMENSION col;
-  JDIMENSION num_cols = cinfo->output_width;
+  JDIMENSION num_cols = input->output_width;
   /* copy these pointers into registers if possible */
-  register JSAMPLE *range_limit = cinfo->sample_range_limit;
+  register JSAMPLE *range_limit = input->sample_range_limit;
   register int *Crrtab = cconvert->Cr_r_tab;
   register int *Cbbtab = cconvert->Cb_b_tab;
   register JLONG *Crgtab = cconvert->Cr_g_tab;
@@ -654,68 +640,74 @@ static INLINE boolean is_big_endian(void)
 
 
 METHODDEF(void)
-ycc_rgb565_convert(j_decompress_ptr cinfo, JSAMPIMAGE input_buf,
+ycc_rgb565_convert(struct jpeg_color_deconverter_input *input,
+		   JSAMPIMAGE input_buf,
                    JDIMENSION input_row, JSAMPARRAY output_buf, int num_rows)
 {
   if (is_big_endian())
-    ycc_rgb565_convert_be(cinfo, input_buf, input_row, output_buf, num_rows);
+    ycc_rgb565_convert_be(input, input_buf, input_row, output_buf, num_rows);
   else
-    ycc_rgb565_convert_le(cinfo, input_buf, input_row, output_buf, num_rows);
+    ycc_rgb565_convert_le(input, input_buf, input_row, output_buf, num_rows);
 }
 
 
 METHODDEF(void)
-ycc_rgb565D_convert(j_decompress_ptr cinfo, JSAMPIMAGE input_buf,
+ycc_rgb565D_convert(struct jpeg_color_deconverter_input *input,
+		    JSAMPIMAGE input_buf,
                     JDIMENSION input_row, JSAMPARRAY output_buf, int num_rows)
 {
   if (is_big_endian())
-    ycc_rgb565D_convert_be(cinfo, input_buf, input_row, output_buf, num_rows);
+    ycc_rgb565D_convert_be(input, input_buf, input_row, output_buf, num_rows);
   else
-    ycc_rgb565D_convert_le(cinfo, input_buf, input_row, output_buf, num_rows);
+    ycc_rgb565D_convert_le(input, input_buf, input_row, output_buf, num_rows);
 }
 
 
 METHODDEF(void)
-rgb_rgb565_convert(j_decompress_ptr cinfo, JSAMPIMAGE input_buf,
+rgb_rgb565_convert(struct jpeg_color_deconverter_input *input,
+		   JSAMPIMAGE input_buf,
                    JDIMENSION input_row, JSAMPARRAY output_buf, int num_rows)
 {
   if (is_big_endian())
-    rgb_rgb565_convert_be(cinfo, input_buf, input_row, output_buf, num_rows);
+    rgb_rgb565_convert_be(input, input_buf, input_row, output_buf, num_rows);
   else
-    rgb_rgb565_convert_le(cinfo, input_buf, input_row, output_buf, num_rows);
+    rgb_rgb565_convert_le(input, input_buf, input_row, output_buf, num_rows);
 }
 
 
 METHODDEF(void)
-rgb_rgb565D_convert(j_decompress_ptr cinfo, JSAMPIMAGE input_buf,
+rgb_rgb565D_convert(struct jpeg_color_deconverter_input *input,
+		    JSAMPIMAGE input_buf,
                     JDIMENSION input_row, JSAMPARRAY output_buf, int num_rows)
 {
   if (is_big_endian())
-    rgb_rgb565D_convert_be(cinfo, input_buf, input_row, output_buf, num_rows);
+    rgb_rgb565D_convert_be(input, input_buf, input_row, output_buf, num_rows);
   else
-    rgb_rgb565D_convert_le(cinfo, input_buf, input_row, output_buf, num_rows);
+    rgb_rgb565D_convert_le(input, input_buf, input_row, output_buf, num_rows);
 }
 
 
 METHODDEF(void)
-gray_rgb565_convert(j_decompress_ptr cinfo, JSAMPIMAGE input_buf,
+gray_rgb565_convert(struct jpeg_color_deconverter_input *input,
+		    JSAMPIMAGE input_buf,
                     JDIMENSION input_row, JSAMPARRAY output_buf, int num_rows)
 {
   if (is_big_endian())
-    gray_rgb565_convert_be(cinfo, input_buf, input_row, output_buf, num_rows);
+    gray_rgb565_convert_be(input, input_buf, input_row, output_buf, num_rows);
   else
-    gray_rgb565_convert_le(cinfo, input_buf, input_row, output_buf, num_rows);
+    gray_rgb565_convert_le(input, input_buf, input_row, output_buf, num_rows);
 }
 
 
 METHODDEF(void)
-gray_rgb565D_convert(j_decompress_ptr cinfo, JSAMPIMAGE input_buf,
+gray_rgb565D_convert(struct jpeg_color_deconverter_input *input,
+		     JSAMPIMAGE input_buf,
                      JDIMENSION input_row, JSAMPARRAY output_buf, int num_rows)
 {
   if (is_big_endian())
-    gray_rgb565D_convert_be(cinfo, input_buf, input_row, output_buf, num_rows);
+    gray_rgb565D_convert_be(input, input_buf, input_row, output_buf, num_rows);
   else
-    gray_rgb565D_convert_le(cinfo, input_buf, input_row, output_buf, num_rows);
+    gray_rgb565D_convert_le(input, input_buf, input_row, output_buf, num_rows);
 }
 
 

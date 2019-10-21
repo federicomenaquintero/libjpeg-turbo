@@ -278,7 +278,8 @@ jsimd_rgb_gray_convert(struct jpeg_color_converter_input *input,
 }
 
 GLOBAL(void)
-jsimd_ycc_rgb_convert(j_decompress_ptr cinfo, JSAMPIMAGE input_buf,
+jsimd_ycc_rgb_convert(struct jpeg_color_deconverter_input *input,
+		      JSAMPIMAGE input_buf,
                       JDIMENSION input_row, JSAMPARRAY output_buf,
                       int num_rows)
 {
@@ -286,7 +287,7 @@ jsimd_ycc_rgb_convert(j_decompress_ptr cinfo, JSAMPIMAGE input_buf,
   void (*sse2fct) (JDIMENSION, JSAMPIMAGE, JDIMENSION, JSAMPARRAY, int);
   void (*mmxfct) (JDIMENSION, JSAMPIMAGE, JDIMENSION, JSAMPARRAY, int);
 
-  switch (cinfo->out_color_space) {
+  switch (input->out_color_space) {
   case JCS_EXT_RGB:
     avx2fct = jsimd_ycc_extrgb_convert_avx2;
     sse2fct = jsimd_ycc_extrgb_convert_sse2;
@@ -329,15 +330,16 @@ jsimd_ycc_rgb_convert(j_decompress_ptr cinfo, JSAMPIMAGE input_buf,
   }
 
   if (simd_support & JSIMD_AVX2)
-    avx2fct(cinfo->output_width, input_buf, input_row, output_buf, num_rows);
+    avx2fct(input->output_width, input_buf, input_row, output_buf, num_rows);
   else if (simd_support & JSIMD_SSE2)
-    sse2fct(cinfo->output_width, input_buf, input_row, output_buf, num_rows);
+    sse2fct(input->output_width, input_buf, input_row, output_buf, num_rows);
   else
-    mmxfct(cinfo->output_width, input_buf, input_row, output_buf, num_rows);
+    mmxfct(input->output_width, input_buf, input_row, output_buf, num_rows);
 }
 
 GLOBAL(void)
-jsimd_ycc_rgb565_convert(j_decompress_ptr cinfo, JSAMPIMAGE input_buf,
+jsimd_ycc_rgb565_convert(struct jpeg_color_deconverter_input *input,
+			 JSAMPIMAGE input_buf,
                          JDIMENSION input_row, JSAMPARRAY output_buf,
                          int num_rows)
 {
