@@ -338,13 +338,17 @@ jsimd_can_h2v1_upsample(void)
 }
 
 GLOBAL(void)
-jsimd_h2v2_upsample(j_decompress_ptr cinfo, jpeg_component_info *compptr,
+jsimd_h2v2_upsample(JDIMENSION output_width,
+                    struct jpeg_upsampler_args args,
+                    jpeg_component_info *compptr,
                     JSAMPARRAY input_data, JSAMPARRAY *output_data_ptr)
 {
 }
 
 GLOBAL(void)
-jsimd_h2v1_upsample(j_decompress_ptr cinfo, jpeg_component_info *compptr,
+jsimd_h2v1_upsample(JDIMENSION output_width,
+                    struct jpeg_upsampler_args args,
+                    jpeg_component_info *compptr,
                     JSAMPARRAY input_data, JSAMPARRAY *output_data_ptr)
 {
 }
@@ -373,16 +377,20 @@ jsimd_can_h2v1_fancy_upsample(void)
 }
 
 GLOBAL(void)
-jsimd_h2v2_fancy_upsample(j_decompress_ptr cinfo, jpeg_component_info *compptr,
+jsimd_h2v2_fancy_upsample(JDIMENSION output_width,
+                          struct jpeg_upsampler_args args,
+                          jpeg_component_info *compptr,
                           JSAMPARRAY input_data, JSAMPARRAY *output_data_ptr)
 {
 }
 
 GLOBAL(void)
-jsimd_h2v1_fancy_upsample(j_decompress_ptr cinfo, jpeg_component_info *compptr,
+jsimd_h2v1_fancy_upsample(JDIMENSION output_width,
+                          struct jpeg_upsampler_args args,
+                          jpeg_component_info *compptr,
                           JSAMPARRAY input_data, JSAMPARRAY *output_data_ptr)
 {
-  jsimd_h2v1_fancy_upsample_neon(cinfo->max_v_samp_factor,
+  jsimd_h2v1_fancy_upsample_neon(args.max_v_samp_factor,
                                  compptr->downsampled_width, input_data,
                                  output_data_ptr);
 }
@@ -400,13 +408,17 @@ jsimd_can_h2v1_merged_upsample(void)
 }
 
 GLOBAL(void)
-jsimd_h2v2_merged_upsample(j_decompress_ptr cinfo, JSAMPIMAGE input_buf,
+jsimd_h2v2_merged_upsample(JDIMENSION output_width,
+                           struct jpeg_upsampler_args args,
+                           JSAMPIMAGE input_buf,
                            JDIMENSION in_row_group_ctr, JSAMPARRAY output_buf)
 {
 }
 
 GLOBAL(void)
-jsimd_h2v1_merged_upsample(j_decompress_ptr cinfo, JSAMPIMAGE input_buf,
+jsimd_h2v1_merged_upsample(JDIMENSION output_width,
+                           struct jpeg_upsampler_args args,
+                           JSAMPIMAGE input_buf,
                            JDIMENSION in_row_group_ctr, JSAMPARRAY output_buf)
 {
 }

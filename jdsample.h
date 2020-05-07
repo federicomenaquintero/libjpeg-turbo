@@ -10,9 +10,9 @@
 #define JPEG_INTERNALS
 #include "jpeglib.h"
 
-
 /* Pointer to routine to upsample a single component */
-typedef void (*upsample1_ptr) (j_decompress_ptr cinfo,
+typedef void (*upsample1_ptr) (JDIMENSION output_width,
+                               struct jpeg_upsampler_args args,
                                jpeg_component_info *compptr,
                                JSAMPARRAY input_data,
                                JSAMPARRAY *output_data_ptr);

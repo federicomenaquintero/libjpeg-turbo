@@ -15,18 +15,20 @@
 
 INLINE
 LOCAL(void)
-h2v1_merged_upsample_565_internal(j_decompress_ptr cinfo, JSAMPIMAGE input_buf,
+h2v1_merged_upsample_565_internal(JDIMENSION output_width,
+                                  struct jpeg_upsampler_args args,
+                                  JSAMPIMAGE input_buf,
                                   JDIMENSION in_row_group_ctr,
                                   JSAMPARRAY output_buf)
 {
-  my_upsample_ptr upsample = (my_upsample_ptr)cinfo->upsample;
+  my_upsample_ptr upsample = (my_upsample_ptr)args.upsample;
   register int y, cred, cgreen, cblue;
   int cb, cr;
   register JSAMPROW outptr;
   JSAMPROW inptr0, inptr1, inptr2;
   JDIMENSION col;
   /* copy these pointers into registers if possible */
-  register JSAMPLE *range_limit = cinfo->sample_range_limit;
+  register JSAMPLE *range_limit = args.sample_range_limit;
   int *Crrtab = upsample->Cr_r_tab;
   int *Cbbtab = upsample->Cb_b_tab;
   JLONG *Crgtab = upsample->Cr_g_tab;
@@ -41,7 +43,7 @@ h2v1_merged_upsample_565_internal(j_decompress_ptr cinfo, JSAMPIMAGE input_buf,
   outptr = output_buf[0];
 
   /* Loop for each pair of output pixels */
-  for (col = cinfo->output_width >> 1; col > 0; col--) {
+  for (col = output_width >> 1; col > 0; col--) {
     /* Do the chroma part of the calculation */
     cb = GETJSAMPLE(*inptr1++);
     cr = GETJSAMPLE(*inptr2++);
@@ -67,7 +69,7 @@ h2v1_merged_upsample_565_internal(j_decompress_ptr cinfo, JSAMPIMAGE input_buf,
   }
 
   /* If image width is odd, do the last output column separately */
-  if (cinfo->output_width & 1) {
+  if (output_width & 1) {
     cb = GETJSAMPLE(*inptr1);
     cr = GETJSAMPLE(*inptr2);
     cred = Crrtab[cr];
@@ -85,24 +87,25 @@ h2v1_merged_upsample_565_internal(j_decompress_ptr cinfo, JSAMPIMAGE input_buf,
 
 INLINE
 LOCAL(void)
-h2v1_merged_upsample_565D_internal(j_decompress_ptr cinfo,
+h2v1_merged_upsample_565D_internal(JDIMENSION output_width,
+                                   struct jpeg_upsampler_args args,
                                    JSAMPIMAGE input_buf,
                                    JDIMENSION in_row_group_ctr,
                                    JSAMPARRAY output_buf)
 {
-  my_upsample_ptr upsample = (my_upsample_ptr)cinfo->upsample;
+  my_upsample_ptr upsample = (my_upsample_ptr)args.upsample;
   register int y, cred, cgreen, cblue;
   int cb, cr;
   register JSAMPROW outptr;
   JSAMPROW inptr0, inptr1, inptr2;
   JDIMENSION col;
   /* copy these pointers into registers if possible */
-  register JSAMPLE *range_limit = cinfo->sample_range_limit;
+  register JSAMPLE *range_limit = args.sample_range_limit;
   int *Crrtab = upsample->Cr_r_tab;
   int *Cbbtab = upsample->Cb_b_tab;
   JLONG *Crgtab = upsample->Cr_g_tab;
   JLONG *Cbgtab = upsample->Cb_g_tab;
-  JLONG d0 = dither_matrix[cinfo->output_scanline & DITHER_MASK];
+  JLONG d0 = dither_matrix[args.output_scanline & DITHER_MASK];
   unsigned int r, g, b;
   JLONG rgb;
   SHIFT_TEMPS
@@ -113,7 +116,7 @@ h2v1_merged_upsample_565D_internal(j_decompress_ptr cinfo,
   outptr = output_buf[0];
 
   /* Loop for each pair of output pixels */
-  for (col = cinfo->output_width >> 1; col > 0; col--) {
+  for (col = output_width >> 1; col > 0; col--) {
     /* Do the chroma part of the calculation */
     cb = GETJSAMPLE(*inptr1++);
     cr = GETJSAMPLE(*inptr2++);
@@ -141,7 +144,7 @@ h2v1_merged_upsample_565D_internal(j_decompress_ptr cinfo,
   }
 
   /* If image width is odd, do the last output column separately */
-  if (cinfo->output_width & 1) {
+  if (output_width & 1) {
     cb = GETJSAMPLE(*inptr1);
     cr = GETJSAMPLE(*inptr2);
     cred = Crrtab[cr];
@@ -159,18 +162,20 @@ h2v1_merged_upsample_565D_internal(j_decompress_ptr cinfo,
 
 INLINE
 LOCAL(void)
-h2v2_merged_upsample_565_internal(j_decompress_ptr cinfo, JSAMPIMAGE input_buf,
+h2v2_merged_upsample_565_internal(JDIMENSION output_width,
+                                  struct jpeg_upsampler_args args,
+                                  JSAMPIMAGE input_buf,
                                   JDIMENSION in_row_group_ctr,
                                   JSAMPARRAY output_buf)
 {
-  my_upsample_ptr upsample = (my_upsample_ptr)cinfo->upsample;
+  my_upsample_ptr upsample = (my_upsample_ptr)args.upsample;
   register int y, cred, cgreen, cblue;
   int cb, cr;
   register JSAMPROW outptr0, outptr1;
   JSAMPROW inptr00, inptr01, inptr1, inptr2;
   JDIMENSION col;
   /* copy these pointers into registers if possible */
-  register JSAMPLE *range_limit = cinfo->sample_range_limit;
+  register JSAMPLE *range_limit = args.sample_range_limit;
   int *Crrtab = upsample->Cr_r_tab;
   int *Cbbtab = upsample->Cb_b_tab;
   JLONG *Crgtab = upsample->Cr_g_tab;
@@ -187,7 +192,7 @@ h2v2_merged_upsample_565_internal(j_decompress_ptr cinfo, JSAMPIMAGE input_buf,
   outptr1 = output_buf[1];
 
   /* Loop for each group of output pixels */
-  for (col = cinfo->output_width >> 1; col > 0; col--) {
+  for (col = output_width >> 1; col > 0; col--) {
     /* Do the chroma part of the calculation */
     cb = GETJSAMPLE(*inptr1++);
     cr = GETJSAMPLE(*inptr2++);
@@ -228,7 +233,7 @@ h2v2_merged_upsample_565_internal(j_decompress_ptr cinfo, JSAMPIMAGE input_buf,
   }
 
   /* If image width is odd, do the last output column separately */
-  if (cinfo->output_width & 1) {
+  if (output_width & 1) {
     cb = GETJSAMPLE(*inptr1);
     cr = GETJSAMPLE(*inptr2);
     cred = Crrtab[cr];
@@ -254,25 +259,26 @@ h2v2_merged_upsample_565_internal(j_decompress_ptr cinfo, JSAMPIMAGE input_buf,
 
 INLINE
 LOCAL(void)
-h2v2_merged_upsample_565D_internal(j_decompress_ptr cinfo,
+h2v2_merged_upsample_565D_internal(JDIMENSION output_width,
+                                   struct jpeg_upsampler_args args,
                                    JSAMPIMAGE input_buf,
                                    JDIMENSION in_row_group_ctr,
                                    JSAMPARRAY output_buf)
 {
-  my_upsample_ptr upsample = (my_upsample_ptr)cinfo->upsample;
+  my_upsample_ptr upsample = (my_upsample_ptr)args.upsample;
   register int y, cred, cgreen, cblue;
   int cb, cr;
   register JSAMPROW outptr0, outptr1;
   JSAMPROW inptr00, inptr01, inptr1, inptr2;
   JDIMENSION col;
   /* copy these pointers into registers if possible */
-  register JSAMPLE *range_limit = cinfo->sample_range_limit;
+  register JSAMPLE *range_limit = args.sample_range_limit;
   int *Crrtab = upsample->Cr_r_tab;
   int *Cbbtab = upsample->Cb_b_tab;
   JLONG *Crgtab = upsample->Cr_g_tab;
   JLONG *Cbgtab = upsample->Cb_g_tab;
-  JLONG d0 = dither_matrix[cinfo->output_scanline & DITHER_MASK];
-  JLONG d1 = dither_matrix[(cinfo->output_scanline + 1) & DITHER_MASK];
+  JLONG d0 = dither_matrix[args.output_scanline & DITHER_MASK];
+  JLONG d1 = dither_matrix[(args.output_scanline + 1) & DITHER_MASK];
   unsigned int r, g, b;
   JLONG rgb;
   SHIFT_TEMPS
@@ -285,7 +291,7 @@ h2v2_merged_upsample_565D_internal(j_decompress_ptr cinfo,
   outptr1 = output_buf[1];
 
   /* Loop for each group of output pixels */
-  for (col = cinfo->output_width >> 1; col > 0; col--) {
+  for (col = output_width >> 1; col > 0; col--) {
     /* Do the chroma part of the calculation */
     cb = GETJSAMPLE(*inptr1++);
     cr = GETJSAMPLE(*inptr2++);
@@ -330,7 +336,7 @@ h2v2_merged_upsample_565D_internal(j_decompress_ptr cinfo,
   }
 
   /* If image width is odd, do the last output column separately */
-  if (cinfo->output_width & 1) {
+  if (output_width & 1) {
     cb = GETJSAMPLE(*inptr1);
     cr = GETJSAMPLE(*inptr2);
     cred = Crrtab[cr];

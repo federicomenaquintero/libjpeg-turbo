@@ -474,32 +474,36 @@ jsimd_can_h2v1_upsample(void)
 }
 
 GLOBAL(void)
-jsimd_h2v2_upsample(j_decompress_ptr cinfo, jpeg_component_info *compptr,
+jsimd_h2v2_upsample(JDIMENSION output_width,
+                    struct jpeg_upsampler_args args,
+                    jpeg_component_info *compptr,
                     JSAMPARRAY input_data, JSAMPARRAY *output_data_ptr)
 {
   if (simd_support & JSIMD_AVX2)
-    jsimd_h2v2_upsample_avx2(cinfo->max_v_samp_factor, cinfo->output_width,
+    jsimd_h2v2_upsample_avx2(args.max_v_samp_factor, output_width,
                              input_data, output_data_ptr);
   else if (simd_support & JSIMD_SSE2)
-    jsimd_h2v2_upsample_sse2(cinfo->max_v_samp_factor, cinfo->output_width,
+    jsimd_h2v2_upsample_sse2(args.max_v_samp_factor, output_width,
                              input_data, output_data_ptr);
   else
-    jsimd_h2v2_upsample_mmx(cinfo->max_v_samp_factor, cinfo->output_width,
+    jsimd_h2v2_upsample_mmx(args.max_v_samp_factor, output_width,
                             input_data, output_data_ptr);
 }
 
 GLOBAL(void)
-jsimd_h2v1_upsample(j_decompress_ptr cinfo, jpeg_component_info *compptr,
+jsimd_h2v1_upsample(JDIMENSION output_width,
+                    struct jpeg_upsampler_args args,
+                    jpeg_component_info *compptr,
                     JSAMPARRAY input_data, JSAMPARRAY *output_data_ptr)
 {
   if (simd_support & JSIMD_AVX2)
-    jsimd_h2v1_upsample_avx2(cinfo->max_v_samp_factor, cinfo->output_width,
+    jsimd_h2v1_upsample_avx2(args.max_v_samp_factor, output_width,
                              input_data, output_data_ptr);
   else if (simd_support & JSIMD_SSE2)
-    jsimd_h2v1_upsample_sse2(cinfo->max_v_samp_factor, cinfo->output_width,
+    jsimd_h2v1_upsample_sse2(args.max_v_samp_factor, output_width,
                              input_data, output_data_ptr);
   else
-    jsimd_h2v1_upsample_mmx(cinfo->max_v_samp_factor, cinfo->output_width,
+    jsimd_h2v1_upsample_mmx(args.max_v_samp_factor, output_width,
                             input_data, output_data_ptr);
 }
 
@@ -550,37 +554,41 @@ jsimd_can_h2v1_fancy_upsample(void)
 }
 
 GLOBAL(void)
-jsimd_h2v2_fancy_upsample(j_decompress_ptr cinfo, jpeg_component_info *compptr,
+jsimd_h2v2_fancy_upsample(JDIMENSION output_width,
+                          struct jpeg_upsampler_args args,
+                          jpeg_component_info *compptr,
                           JSAMPARRAY input_data, JSAMPARRAY *output_data_ptr)
 {
   if (simd_support & JSIMD_AVX2)
-    jsimd_h2v2_fancy_upsample_avx2(cinfo->max_v_samp_factor,
+    jsimd_h2v2_fancy_upsample_avx2(args.max_v_samp_factor,
                                    compptr->downsampled_width, input_data,
                                    output_data_ptr);
   else if (simd_support & JSIMD_SSE2)
-    jsimd_h2v2_fancy_upsample_sse2(cinfo->max_v_samp_factor,
+    jsimd_h2v2_fancy_upsample_sse2(args.max_v_samp_factor,
                                    compptr->downsampled_width, input_data,
                                    output_data_ptr);
   else
-    jsimd_h2v2_fancy_upsample_mmx(cinfo->max_v_samp_factor,
+    jsimd_h2v2_fancy_upsample_mmx(args.max_v_samp_factor,
                                   compptr->downsampled_width, input_data,
                                   output_data_ptr);
 }
 
 GLOBAL(void)
-jsimd_h2v1_fancy_upsample(j_decompress_ptr cinfo, jpeg_component_info *compptr,
+jsimd_h2v1_fancy_upsample(JDIMENSION output_width,
+                          struct jpeg_upsampler_args args,
+                          jpeg_component_info *compptr,
                           JSAMPARRAY input_data, JSAMPARRAY *output_data_ptr)
 {
   if (simd_support & JSIMD_AVX2)
-    jsimd_h2v1_fancy_upsample_avx2(cinfo->max_v_samp_factor,
+    jsimd_h2v1_fancy_upsample_avx2(args.max_v_samp_factor,
                                    compptr->downsampled_width, input_data,
                                    output_data_ptr);
   else if (simd_support & JSIMD_SSE2)
-    jsimd_h2v1_fancy_upsample_sse2(cinfo->max_v_samp_factor,
+    jsimd_h2v1_fancy_upsample_sse2(args.max_v_samp_factor,
                                    compptr->downsampled_width, input_data,
                                    output_data_ptr);
   else
-    jsimd_h2v1_fancy_upsample_mmx(cinfo->max_v_samp_factor,
+    jsimd_h2v1_fancy_upsample_mmx(args.ax_v_samp_factor,
                                   compptr->downsampled_width, input_data,
                                   output_data_ptr);
 }
@@ -632,14 +640,16 @@ jsimd_can_h2v1_merged_upsample(void)
 }
 
 GLOBAL(void)
-jsimd_h2v2_merged_upsample(j_decompress_ptr cinfo, JSAMPIMAGE input_buf,
+jsimd_h2v2_merged_upsample(JDIMENSION output_width,
+                           struct jpeg_upsampler_args args,
+                           JSAMPIMAGE input_buf,
                            JDIMENSION in_row_group_ctr, JSAMPARRAY output_buf)
 {
   void (*avx2fct) (JDIMENSION, JSAMPIMAGE, JDIMENSION, JSAMPARRAY);
   void (*sse2fct) (JDIMENSION, JSAMPIMAGE, JDIMENSION, JSAMPARRAY);
   void (*mmxfct) (JDIMENSION, JSAMPIMAGE, JDIMENSION, JSAMPARRAY);
 
-  switch (cinfo->out_color_space) {
+  switch (args.out_color_space) {
   case JCS_EXT_RGB:
     avx2fct = jsimd_h2v2_extrgb_merged_upsample_avx2;
     sse2fct = jsimd_h2v2_extrgb_merged_upsample_sse2;
@@ -682,22 +692,24 @@ jsimd_h2v2_merged_upsample(j_decompress_ptr cinfo, JSAMPIMAGE input_buf,
   }
 
   if (simd_support & JSIMD_AVX2)
-    avx2fct(cinfo->output_width, input_buf, in_row_group_ctr, output_buf);
+    avx2fct(output_width, input_buf, in_row_group_ctr, output_buf);
   else if (simd_support & JSIMD_SSE2)
-    sse2fct(cinfo->output_width, input_buf, in_row_group_ctr, output_buf);
+    sse2fct(output_width, input_buf, in_row_group_ctr, output_buf);
   else
-    mmxfct(cinfo->output_width, input_buf, in_row_group_ctr, output_buf);
+    mmxfct(output_width, input_buf, in_row_group_ctr, output_buf);
 }
 
 GLOBAL(void)
-jsimd_h2v1_merged_upsample(j_decompress_ptr cinfo, JSAMPIMAGE input_buf,
+jsimd_h2v1_merged_upsample(JDIMENSION output_width,
+                           struct jpeg_upsampler_args args,
+                           JSAMPIMAGE input_buf,
                            JDIMENSION in_row_group_ctr, JSAMPARRAY output_buf)
 {
   void (*avx2fct) (JDIMENSION, JSAMPIMAGE, JDIMENSION, JSAMPARRAY);
   void (*sse2fct) (JDIMENSION, JSAMPIMAGE, JDIMENSION, JSAMPARRAY);
   void (*mmxfct) (JDIMENSION, JSAMPIMAGE, JDIMENSION, JSAMPARRAY);
 
-  switch (cinfo->out_color_space) {
+  switch (args.out_color_space) {
   case JCS_EXT_RGB:
     avx2fct = jsimd_h2v1_extrgb_merged_upsample_avx2;
     sse2fct = jsimd_h2v1_extrgb_merged_upsample_sse2;
@@ -740,11 +752,11 @@ jsimd_h2v1_merged_upsample(j_decompress_ptr cinfo, JSAMPIMAGE input_buf,
   }
 
   if (simd_support & JSIMD_AVX2)
-    avx2fct(cinfo->output_width, input_buf, in_row_group_ctr, output_buf);
+    avx2fct(output_width, input_buf, in_row_group_ctr, output_buf);
   else if (simd_support & JSIMD_SSE2)
-    sse2fct(cinfo->output_width, input_buf, in_row_group_ctr, output_buf);
+    sse2fct(output_width, input_buf, in_row_group_ctr, output_buf);
   else
-    mmxfct(cinfo->output_width, input_buf, in_row_group_ctr, output_buf);
+    mmxfct(output_width, input_buf, in_row_group_ctr, output_buf);
 }
 
 GLOBAL(int)

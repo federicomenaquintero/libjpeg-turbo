@@ -73,15 +73,18 @@ EXTERN(int) jsimd_can_h2v2_upsample(void);
 EXTERN(int) jsimd_can_h2v1_upsample(void);
 EXTERN(int) jsimd_can_int_upsample(void);
 
-EXTERN(void) jsimd_h2v2_upsample(j_decompress_ptr cinfo,
+EXTERN(void) jsimd_h2v2_upsample(JDIMENSION output_width,
+                                 struct jpeg_upsampler_args args,
                                  jpeg_component_info *compptr,
                                  JSAMPARRAY input_data,
                                  JSAMPARRAY *output_data_ptr);
-EXTERN(void) jsimd_h2v1_upsample(j_decompress_ptr cinfo,
+EXTERN(void) jsimd_h2v1_upsample(JDIMENSION output_width,
+                                 struct jpeg_upsampler_args args,
                                  jpeg_component_info *compptr,
                                  JSAMPARRAY input_data,
                                  JSAMPARRAY *output_data_ptr);
-EXTERN(void) jsimd_int_upsample(j_decompress_ptr cinfo,
+EXTERN(void) jsimd_int_upsample(JDIMENSION output_width,
+                                struct jpeg_upsampler_args args,
                                 jpeg_component_info *compptr,
                                 JSAMPARRAY input_data,
                                 JSAMPARRAY *output_data_ptr);
@@ -89,11 +92,13 @@ EXTERN(void) jsimd_int_upsample(j_decompress_ptr cinfo,
 EXTERN(int) jsimd_can_h2v2_fancy_upsample(void);
 EXTERN(int) jsimd_can_h2v1_fancy_upsample(void);
 
-EXTERN(void) jsimd_h2v2_fancy_upsample(j_decompress_ptr cinfo,
+EXTERN(void) jsimd_h2v2_fancy_upsample(JDIMENSION output_width,
+                                       struct jpeg_upsampler_args args,
                                        jpeg_component_info *compptr,
                                        JSAMPARRAY input_data,
                                        JSAMPARRAY *output_data_ptr);
-EXTERN(void) jsimd_h2v1_fancy_upsample(j_decompress_ptr cinfo,
+EXTERN(void) jsimd_h2v1_fancy_upsample(JDIMENSION output_width,
+                                       struct jpeg_upsampler_args args,
                                        jpeg_component_info *compptr,
                                        JSAMPARRAY input_data,
                                        JSAMPARRAY *output_data_ptr);
@@ -101,11 +106,13 @@ EXTERN(void) jsimd_h2v1_fancy_upsample(j_decompress_ptr cinfo,
 EXTERN(int) jsimd_can_h2v2_merged_upsample(void);
 EXTERN(int) jsimd_can_h2v1_merged_upsample(void);
 
-EXTERN(void) jsimd_h2v2_merged_upsample(j_decompress_ptr cinfo,
+EXTERN(void) jsimd_h2v2_merged_upsample(JDIMENSION output_width,
+                                        struct jpeg_upsampler_args args,
                                         JSAMPIMAGE input_buf,
                                         JDIMENSION in_row_group_ctr,
                                         JSAMPARRAY output_buf);
-EXTERN(void) jsimd_h2v1_merged_upsample(j_decompress_ptr cinfo,
+EXTERN(void) jsimd_h2v1_merged_upsample(JDIMENSION output_width,
+                                        struct jpeg_upsampler_args args,
                                         JSAMPIMAGE input_buf,
                                         JDIMENSION in_row_group_ctr,
                                         JSAMPARRAY output_buf);
