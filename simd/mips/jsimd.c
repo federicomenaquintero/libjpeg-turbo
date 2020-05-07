@@ -966,7 +966,7 @@ jsimd_can_idct_12x12(void)
 }
 
 GLOBAL(void)
-jsimd_idct_2x2(j_decompress_ptr cinfo, jpeg_component_info *compptr,
+jsimd_idct_2x2(JSAMPLE *sample_range_limit, jpeg_component_info *compptr,
                JCOEFPTR coef_block, JSAMPARRAY output_buf,
                JDIMENSION output_col)
 {
@@ -974,7 +974,7 @@ jsimd_idct_2x2(j_decompress_ptr cinfo, jpeg_component_info *compptr,
 }
 
 GLOBAL(void)
-jsimd_idct_4x4(j_decompress_ptr cinfo, jpeg_component_info *compptr,
+jsimd_idct_4x4(JSAMPLE *sample_range_limit, jpeg_component_info *compptr,
                JCOEFPTR coef_block, JSAMPARRAY output_buf,
                JDIMENSION output_col)
 {
@@ -985,7 +985,7 @@ jsimd_idct_4x4(j_decompress_ptr cinfo, jpeg_component_info *compptr,
 }
 
 GLOBAL(void)
-jsimd_idct_6x6(j_decompress_ptr cinfo, jpeg_component_info *compptr,
+jsimd_idct_6x6(JSAMPLE *sample_range_limit, jpeg_component_info *compptr,
                JCOEFPTR coef_block, JSAMPARRAY output_buf,
                JDIMENSION output_col)
 {
@@ -993,7 +993,7 @@ jsimd_idct_6x6(j_decompress_ptr cinfo, jpeg_component_info *compptr,
 }
 
 GLOBAL(void)
-jsimd_idct_12x12(j_decompress_ptr cinfo, jpeg_component_info *compptr,
+jsimd_idct_12x12(JSAMPLE *sample_range_limit, jpeg_component_info *compptr,
                  JCOEFPTR coef_block, JSAMPARRAY output_buf,
                  JDIMENSION output_col)
 {
@@ -1074,7 +1074,7 @@ jsimd_can_idct_float(void)
 }
 
 GLOBAL(void)
-jsimd_idct_islow(j_decompress_ptr cinfo, jpeg_component_info *compptr,
+jsimd_idct_islow(JSAMPLE *sample_range_limit, jpeg_component_info *compptr,
                  JCOEFPTR coef_block, JSAMPARRAY output_buf,
                  JDIMENSION output_col)
 {
@@ -1090,11 +1090,11 @@ jsimd_idct_islow(j_decompress_ptr cinfo, jpeg_component_info *compptr,
   };
 
   jsimd_idct_islow_dspr2(coef_block, compptr->dct_table, output,
-                         IDCT_range_limit(cinfo));
+                         IDCT_range_limit_from_samples(sample_range_limit));
 }
 
 GLOBAL(void)
-jsimd_idct_ifast(j_decompress_ptr cinfo, jpeg_component_info *compptr,
+jsimd_idct_ifast(JSAMPLE *sample_range_limit, jpeg_component_info *compptr,
                  JCOEFPTR coef_block, JSAMPARRAY output_buf,
                  JDIMENSION output_col)
 {
@@ -1119,7 +1119,7 @@ jsimd_idct_ifast(j_decompress_ptr cinfo, jpeg_component_info *compptr,
 }
 
 GLOBAL(void)
-jsimd_idct_float(j_decompress_ptr cinfo, jpeg_component_info *compptr,
+jsimd_idct_float(JSAMPLE *sample_range_limit, jpeg_component_info *compptr,
                  JCOEFPTR coef_block, JSAMPARRAY output_buf,
                  JDIMENSION output_col)
 {

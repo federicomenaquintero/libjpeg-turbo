@@ -118,7 +118,7 @@
  */
 
 GLOBAL(void)
-jpeg_idct_4x4(j_decompress_ptr cinfo, jpeg_component_info *compptr,
+jpeg_idct_4x4(JSAMPLE *sample_range_limit, jpeg_component_info *compptr,
               JCOEFPTR coef_block, JSAMPARRAY output_buf,
               JDIMENSION output_col)
 {
@@ -128,7 +128,7 @@ jpeg_idct_4x4(j_decompress_ptr cinfo, jpeg_component_info *compptr,
   ISLOW_MULT_TYPE *quantptr;
   int *wsptr;
   JSAMPROW outptr;
-  JSAMPLE *range_limit = IDCT_range_limit(cinfo);
+  JSAMPLE *range_limit = IDCT_range_limit_from_samples(sample_range_limit);
   int ctr;
   int workspace[DCTSIZE * 4];   /* buffers data between passes */
   SHIFT_TEMPS
@@ -276,7 +276,7 @@ jpeg_idct_4x4(j_decompress_ptr cinfo, jpeg_component_info *compptr,
  */
 
 GLOBAL(void)
-jpeg_idct_2x2(j_decompress_ptr cinfo, jpeg_component_info *compptr,
+jpeg_idct_2x2(JSAMPLE *sample_range_limit, jpeg_component_info *compptr,
               JCOEFPTR coef_block, JSAMPARRAY output_buf,
               JDIMENSION output_col)
 {
@@ -285,7 +285,7 @@ jpeg_idct_2x2(j_decompress_ptr cinfo, jpeg_component_info *compptr,
   ISLOW_MULT_TYPE *quantptr;
   int *wsptr;
   JSAMPROW outptr;
-  JSAMPLE *range_limit = IDCT_range_limit(cinfo);
+  JSAMPLE *range_limit = IDCT_range_limit_from_samples(sample_range_limit);
   int ctr;
   int workspace[DCTSIZE * 2];   /* buffers data between passes */
   SHIFT_TEMPS
@@ -387,13 +387,13 @@ jpeg_idct_2x2(j_decompress_ptr cinfo, jpeg_component_info *compptr,
  */
 
 GLOBAL(void)
-jpeg_idct_1x1(j_decompress_ptr cinfo, jpeg_component_info *compptr,
+jpeg_idct_1x1(JSAMPLE *sample_range_limit, jpeg_component_info *compptr,
               JCOEFPTR coef_block, JSAMPARRAY output_buf,
               JDIMENSION output_col)
 {
   int dcval;
   ISLOW_MULT_TYPE *quantptr;
-  JSAMPLE *range_limit = IDCT_range_limit(cinfo);
+  JSAMPLE *range_limit = IDCT_range_limit_from_samples(sample_range_limit);
   SHIFT_TEMPS
 
   /* We hardly need an inverse DCT routine for this: just take the

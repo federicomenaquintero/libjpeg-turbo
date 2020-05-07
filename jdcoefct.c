@@ -139,7 +139,7 @@ decompress_onepass(j_decompress_ptr cinfo, JSAMPIMAGE output_buf)
                 yoffset + yindex < compptr->last_row_height) {
               output_col = start_col;
               for (xindex = 0; xindex < useful_width; xindex++) {
-                (*inverse_DCT) (cinfo, compptr,
+                (*inverse_DCT) (cinfo->sample_range_limit, compptr,
                                 (JCOEFPTR)coef->MCU_buffer[blkn + xindex],
                                 output_ptr, output_col);
                 output_col += compptr->_DCT_scaled_size;
@@ -306,7 +306,7 @@ decompress_data(j_decompress_ptr cinfo, JSAMPIMAGE output_buf)
       output_col = 0;
       for (block_num = cinfo->master->first_MCU_col[ci];
            block_num <= cinfo->master->last_MCU_col[ci]; block_num++) {
-        (*inverse_DCT) (cinfo, compptr, (JCOEFPTR)buffer_ptr, output_ptr,
+        (*inverse_DCT) (cinfo->sample_range_limit, compptr, (JCOEFPTR)buffer_ptr, output_ptr,
                         output_col);
         buffer_ptr++;
         output_col += compptr->_DCT_scaled_size;
@@ -598,7 +598,7 @@ decompress_smooth_data(j_decompress_ptr cinfo, JSAMPIMAGE output_buf)
           workspace[2] = (JCOEF)pred;
         }
         /* OK, do the IDCT */
-        (*inverse_DCT) (cinfo, compptr, (JCOEFPTR)workspace, output_ptr,
+        (*inverse_DCT) (cinfo->sample_range_limit, compptr, (JCOEFPTR)workspace, output_ptr,
                         output_col);
         /* Advance for next column */
         DC1 = DC2;  DC2 = DC3;

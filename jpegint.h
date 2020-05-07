@@ -245,7 +245,7 @@ struct jpeg_entropy_decoder {
 };
 
 /* Inverse DCT (also performs dequantization) */
-typedef void (*inverse_DCT_method_ptr) (j_decompress_ptr cinfo,
+typedef void (*inverse_DCT_method_ptr) (JSAMPLE *sample_range_limit,
                                         jpeg_component_info *compptr,
                                         JCOEFPTR coef_block,
                                         JSAMPARRAY output_buf,

@@ -69,7 +69,7 @@
  */
 
 GLOBAL(void)
-jpeg_idct_float(j_decompress_ptr cinfo, jpeg_component_info *compptr,
+jpeg_idct_float(JSAMPLE *sample_range_limit, jpeg_component_info *compptr,
                 JCOEFPTR coef_block, JSAMPARRAY output_buf,
                 JDIMENSION output_col)
 {
@@ -80,7 +80,7 @@ jpeg_idct_float(j_decompress_ptr cinfo, jpeg_component_info *compptr,
   FLOAT_MULT_TYPE *quantptr;
   FAST_FLOAT *wsptr;
   JSAMPROW outptr;
-  JSAMPLE *range_limit = cinfo->sample_range_limit;
+  JSAMPLE *range_limit = sample_range_limit;
   int ctr;
   FAST_FLOAT workspace[DCTSIZE2]; /* buffers data between passes */
 #define _0_125  ((FLOAT_MULT_TYPE)0.125)

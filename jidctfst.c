@@ -168,7 +168,7 @@
  */
 
 GLOBAL(void)
-jpeg_idct_ifast(j_decompress_ptr cinfo, jpeg_component_info *compptr,
+jpeg_idct_ifast(JSAMPLE *sample_range_limit, jpeg_component_info *compptr,
                 JCOEFPTR coef_block, JSAMPARRAY output_buf,
                 JDIMENSION output_col)
 {
@@ -179,7 +179,7 @@ jpeg_idct_ifast(j_decompress_ptr cinfo, jpeg_component_info *compptr,
   IFAST_MULT_TYPE *quantptr;
   int *wsptr;
   JSAMPROW outptr;
-  JSAMPLE *range_limit = IDCT_range_limit(cinfo);
+  JSAMPLE *range_limit = IDCT_range_limit_from_samples(sample_range_limit);
   int ctr;
   int workspace[DCTSIZE2];      /* buffers data between passes */
   SHIFT_TEMPS                   /* for DESCALE */
