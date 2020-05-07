@@ -57,7 +57,8 @@
 
 
 /* Pointer to routine to downsample a single component */
-typedef void (*downsample1_ptr) (j_compress_ptr cinfo,
+typedef void (*downsample1_ptr) (JDIMENSION image_width,
+                                 struct jpeg_downsampler_args args,
                                  jpeg_component_info *compptr,
                                  JSAMPARRAY input_data,
                                  JSAMPARRAY output_data);
@@ -110,6 +111,21 @@ expand_right_edge(JSAMPARRAY image_data, int num_rows, JDIMENSION input_cols,
   }
 }
 
+/* Initialize a struct jpeg_downsampler_args by copying scalar fields
+ * from the cinfo.  This value will then be passed to the downsampler functions.
+*/
+LOCAL(struct jpeg_downsampler_args)
+downsampler_args_from_cinfo(j_compress_ptr cinfo)
+{
+  struct jpeg_downsampler_args args;
+
+  args.max_h_samp_factor = cinfo->max_h_samp_factor;
+  args.max_v_samp_factor = cinfo->max_v_samp_factor;
+  args.smoothing_factor = cinfo->smoothing_factor;
+
+  return args;
+}
+
 
 /*
  * Do downsampling for a whole row group (all components).
@@ -126,12 +142,13 @@ sep_downsample(j_compress_ptr cinfo, JSAMPIMAGE input_buf,
   int ci;
   jpeg_component_info *compptr;
   JSAMPARRAY in_ptr, out_ptr;
+  struct jpeg_downsampler_args args = downsampler_args_from_cinfo(cinfo);
 
   for (ci = 0, compptr = cinfo->comp_info; ci < cinfo->num_components;
        ci++, compptr++) {
     in_ptr = input_buf[ci] + in_row_index;
     out_ptr = output_buf[ci] + (out_row_group_index * compptr->v_samp_factor);
-    (*downsample->methods[ci]) (cinfo, compptr, in_ptr, out_ptr);
+    (*downsample->methods[ci]) (cinfo->image_width, args, compptr, in_ptr, out_ptr);
   }
 }
 
@@ -144,7 +161,9 @@ sep_downsample(j_compress_ptr cinfo, JSAMPIMAGE input_buf,
  */
 
 METHODDEF(void)
-int_downsample(j_compress_ptr cinfo, jpeg_component_info *compptr,
+int_downsample(JDIMENSION image_width,
+               struct jpeg_downsampler_args args,
+               jpeg_component_info *compptr,
                JSAMPARRAY input_data, JSAMPARRAY output_data)
 {
   int inrow, outrow, h_expand, v_expand, numpix, numpix2, h, v;
@@ -153,8 +172,8 @@ int_downsample(j_compress_ptr cinfo, jpeg_component_info *compptr,
   JSAMPROW inptr, outptr;
   JLONG outvalue;
 
-  h_expand = cinfo->max_h_samp_factor / compptr->h_samp_factor;
-  v_expand = cinfo->max_v_samp_factor / compptr->v_samp_factor;
+  h_expand = args.max_h_samp_factor / compptr->h_samp_factor;
+  v_expand = args.max_v_samp_factor / compptr->v_samp_factor;
   numpix = h_expand * v_expand;
   numpix2 = numpix / 2;
 
@@ -162,8 +181,7 @@ int_downsample(j_compress_ptr cinfo, jpeg_component_info *compptr,
    * by the standard loop.  Special-casing padded output would be more
    * efficient.
    */
-  expand_right_edge(input_data, cinfo->max_v_samp_factor, cinfo->image_width,
-                    output_cols * h_expand);
+  expand_right_edge(input_data, args.max_v_samp_factor, image_width, output_cols * h_expand);
 
   inrow = 0;
   for (outrow = 0; outrow < compptr->v_samp_factor; outrow++) {
@@ -191,14 +209,15 @@ int_downsample(j_compress_ptr cinfo, jpeg_component_info *compptr,
  */
 
 METHODDEF(void)
-fullsize_downsample(j_compress_ptr cinfo, jpeg_component_info *compptr,
+fullsize_downsample(JDIMENSION image_width,
+                    struct jpeg_downsampler_args args,
+                    jpeg_component_info *compptr,
                     JSAMPARRAY input_data, JSAMPARRAY output_data)
 {
   /* Copy the data */
-  jcopy_sample_rows(input_data, 0, output_data, 0, cinfo->max_v_samp_factor,
-                    cinfo->image_width);
+  jcopy_sample_rows(input_data, 0, output_data, 0, args.max_v_samp_factor, image_width);
   /* Edge-expand */
-  expand_right_edge(output_data, cinfo->max_v_samp_factor, cinfo->image_width,
+  expand_right_edge(output_data, args.max_v_samp_factor, image_width,
                     compptr->width_in_blocks * DCTSIZE);
 }
 
@@ -216,7 +235,9 @@ fullsize_downsample(j_compress_ptr cinfo, jpeg_component_info *compptr,
  */
 
 METHODDEF(void)
-h2v1_downsample(j_compress_ptr cinfo, jpeg_component_info *compptr,
+h2v1_downsample(JDIMENSION image_width,
+                struct jpeg_downsampler_args args,
+                jpeg_component_info *compptr,
                 JSAMPARRAY input_data, JSAMPARRAY output_data)
 {
   int outrow;
@@ -229,8 +250,7 @@ h2v1_downsample(j_compress_ptr cinfo, jpeg_component_info *compptr,
    * by the standard loop.  Special-casing padded output would be more
    * efficient.
    */
-  expand_right_edge(input_data, cinfo->max_v_samp_factor, cinfo->image_width,
-                    output_cols * 2);
+  expand_right_edge(input_data, args.max_v_samp_factor, image_width, output_cols * 2);
 
   for (outrow = 0; outrow < compptr->v_samp_factor; outrow++) {
     outptr = output_data[outrow];
@@ -253,7 +273,9 @@ h2v1_downsample(j_compress_ptr cinfo, jpeg_component_info *compptr,
  */
 
 METHODDEF(void)
-h2v2_downsample(j_compress_ptr cinfo, jpeg_component_info *compptr,
+h2v2_downsample(JDIMENSION image_width,
+                struct jpeg_downsampler_args args,
+                jpeg_component_info *compptr,
                 JSAMPARRAY input_data, JSAMPARRAY output_data)
 {
   int inrow, outrow;
@@ -266,8 +288,7 @@ h2v2_downsample(j_compress_ptr cinfo, jpeg_component_info *compptr,
    * by the standard loop.  Special-casing padded output would be more
    * efficient.
    */
-  expand_right_edge(input_data, cinfo->max_v_samp_factor, cinfo->image_width,
-                    output_cols * 2);
+  expand_right_edge(input_data, args.max_v_samp_factor, image_width, output_cols * 2);
 
   inrow = 0;
   for (outrow = 0; outrow < compptr->v_samp_factor; outrow++) {
@@ -296,7 +317,9 @@ h2v2_downsample(j_compress_ptr cinfo, jpeg_component_info *compptr,
  */
 
 METHODDEF(void)
-h2v2_smooth_downsample(j_compress_ptr cinfo, jpeg_component_info *compptr,
+h2v2_smooth_downsample(JDIMENSION image_width,
+                       struct jpeg_downsampler_args args,
+                       jpeg_component_info *compptr,
                        JSAMPARRAY input_data, JSAMPARRAY output_data)
 {
   int inrow, outrow;
@@ -309,8 +332,8 @@ h2v2_smooth_downsample(j_compress_ptr cinfo, jpeg_component_info *compptr,
    * by the standard loop.  Special-casing padded output would be more
    * efficient.
    */
-  expand_right_edge(input_data - 1, cinfo->max_v_samp_factor + 2,
-                    cinfo->image_width, output_cols * 2);
+  expand_right_edge(input_data - 1, args.max_v_samp_factor + 2,
+                    image_width, output_cols * 2);
 
   /* We don't bother to form the individual "smoothed" input pixel values;
    * we can directly compute the output which is the average of the four
@@ -325,8 +348,8 @@ h2v2_smooth_downsample(j_compress_ptr cinfo, jpeg_component_info *compptr,
    * Also recall that SF = smoothing_factor / 1024.
    */
 
-  memberscale = 16384 - cinfo->smoothing_factor * 80; /* scaled (1-5*SF)/4 */
-  neighscale = cinfo->smoothing_factor * 16; /* scaled SF/4 */
+  memberscale = 16384 - args.smoothing_factor * 80; /* scaled (1-5*SF)/4 */
+  neighscale = args.smoothing_factor * 16; /* scaled SF/4 */
 
   inrow = 0;
   for (outrow = 0; outrow < compptr->v_samp_factor; outrow++) {
@@ -396,7 +419,9 @@ h2v2_smooth_downsample(j_compress_ptr cinfo, jpeg_component_info *compptr,
  */
 
 METHODDEF(void)
-fullsize_smooth_downsample(j_compress_ptr cinfo, jpeg_component_info *compptr,
+fullsize_smooth_downsample(JDIMENSION image_width,
+                           struct jpeg_downsampler_args args,
+                           jpeg_component_info *compptr,
                            JSAMPARRAY input_data, JSAMPARRAY output_data)
 {
   int outrow;
@@ -410,8 +435,8 @@ fullsize_smooth_downsample(j_compress_ptr cinfo, jpeg_component_info *compptr,
    * by the standard loop.  Special-casing padded output would be more
    * efficient.
    */
-  expand_right_edge(input_data - 1, cinfo->max_v_samp_factor + 2,
-                    cinfo->image_width, output_cols);
+  expand_right_edge(input_data - 1, args.max_v_samp_factor + 2,
+                    image_width, output_cols);
 
   /* Each of the eight neighbor pixels contributes a fraction SF to the
    * smoothed pixel, while the main pixel contributes (1-8*SF).  In order
@@ -419,8 +444,8 @@ fullsize_smooth_downsample(j_compress_ptr cinfo, jpeg_component_info *compptr,
    * Also recall that SF = smoothing_factor / 1024.
    */
 
-  memberscale = 65536L - cinfo->smoothing_factor * 512L; /* scaled 1-8*SF */
-  neighscale = cinfo->smoothing_factor * 64; /* scaled SF */
+  memberscale = 65536L - args.smoothing_factor * 512L; /* scaled 1-8*SF */
+  neighscale = args.smoothing_factor * 64; /* scaled SF */
 
   for (outrow = 0; outrow < compptr->v_samp_factor; outrow++) {
     outptr = output_data[outrow];

@@ -13,6 +13,16 @@
 
 #include "jchuff.h"             /* Declarations shared with jcphuff.c */
 
+/* Downsampler arguments for the downsampling functions.
+ *
+ * The smoothing_factor is ignored by the non-smooth downsamplers.
+ */
+struct jpeg_downsampler_args {
+  int max_h_samp_factor;
+  int max_v_samp_factor;
+  int smoothing_factor;
+};
+
 EXTERN(int) jsimd_can_rgb_ycc(void);
 EXTERN(int) jsimd_can_rgb_gray(void);
 EXTERN(int) jsimd_can_ycc_rgb(void);
@@ -39,19 +49,22 @@ EXTERN(void) jsimd_c_null_convert(struct jpeg_color_converter_input *input,
 EXTERN(int) jsimd_can_h2v2_downsample(void);
 EXTERN(int) jsimd_can_h2v1_downsample(void);
 
-EXTERN(void) jsimd_h2v2_downsample(j_compress_ptr cinfo,
+EXTERN(void) jsimd_h2v2_downsample(JDIMENSION image_width,
+                                   struct jpeg_downsampler_args args,
                                    jpeg_component_info *compptr,
                                    JSAMPARRAY input_data,
                                    JSAMPARRAY output_data);
 
 EXTERN(int) jsimd_can_h2v2_smooth_downsample(void);
 
-EXTERN(void) jsimd_h2v2_smooth_downsample(j_compress_ptr cinfo,
+EXTERN(void) jsimd_h2v2_smooth_downsample(JDIMENSION image_width,
+                                          struct jpeg_downsampler_args args,
                                           jpeg_component_info *compptr,
                                           JSAMPARRAY input_data,
                                           JSAMPARRAY output_data);
 
-EXTERN(void) jsimd_h2v1_downsample(j_compress_ptr cinfo,
+EXTERN(void) jsimd_h2v1_downsample(JDIMENSION image_width,
+                                   struct jpeg_downsampler_args args,
                                    jpeg_component_info *compptr,
                                    JSAMPARRAY input_data,
                                    JSAMPARRAY output_data);
