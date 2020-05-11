@@ -395,36 +395,36 @@ jsimd_can_h2v1_downsample(void)
 
 GLOBAL(void)
 jsimd_h2v2_downsample(JDIMENSION image_width,
-                      struct jpeg_downsampler_args args,
+                      struct jpeg_downsampler_args *args,
                       jpeg_component_info *compptr,
                       JSAMPARRAY input_data, JSAMPARRAY output_data)
 {
-  jsimd_h2v2_downsample_dspr2(image_width, args.max_v_samp_factor,
+  jsimd_h2v2_downsample_dspr2(image_width, args->max_v_samp_factor,
                               compptr->v_samp_factor, compptr->width_in_blocks,
                               input_data, output_data);
 }
 
 GLOBAL(void)
 jsimd_h2v2_smooth_downsample(JDIMENSION image_width,
-                             struct jpeg_downsampler_args args,
+                             struct jpeg_downsampler_args *args,
                              jpeg_component_info *compptr,
                              JSAMPARRAY input_data, JSAMPARRAY output_data)
 {
   jsimd_h2v2_smooth_downsample_dspr2(input_data, output_data,
                                      compptr->v_samp_factor,
-                                     args.max_v_samp_factor,
-                                     args.smoothing_factor,
+                                     args->max_v_samp_factor,
+                                     args->smoothing_factor,
                                      compptr->width_in_blocks,
                                      image_width);
 }
 
 GLOBAL(void)
 jsimd_h2v1_downsample(JDIMENSION image_width,
-                      struct jpeg_downsampler_args args,
+                      struct jpeg_downsampler_args *args,
                       jpeg_component_info *compptr,
                       JSAMPARRAY input_data, JSAMPARRAY output_data)
 {
-  jsimd_h2v1_downsample_dspr2(image_width, args.max_v_samp_factor,
+  jsimd_h2v1_downsample_dspr2(image_width, args->max_v_samp_factor,
                               compptr->v_samp_factor, compptr->width_in_blocks,
                               input_data, output_data);
 }

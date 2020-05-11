@@ -311,7 +311,7 @@ jsimd_can_h2v1_downsample(void)
 
 GLOBAL(void)
 jsimd_h2v2_downsample(JDIMENSION image_width,
-                      struct jpeg_downsampler_args args,
+                      struct jpeg_downsampler_args *args,
                       jpeg_component_info *compptr,
                       JSAMPARRAY input_data, JSAMPARRAY output_data)
 {
@@ -319,7 +319,7 @@ jsimd_h2v2_downsample(JDIMENSION image_width,
 
 GLOBAL(void)
 jsimd_h2v1_downsample(JDIMENSION image_width,
-                      struct jpeg_downsampler_args args,
+                      struct jpeg_downsampler_args *args,
                       jpeg_component_info *compptr,
                       JSAMPARRAY input_data, JSAMPARRAY output_data)
 {
