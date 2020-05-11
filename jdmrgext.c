@@ -22,19 +22,19 @@
 INLINE
 LOCAL(void)
 h2v1_merged_upsample_internal(JDIMENSION output_width,
-                              struct jpeg_upsampler_args args,
+                              struct jpeg_upsampler_args *args,
                               JSAMPIMAGE input_buf,
                               JDIMENSION in_row_group_ctr,
                               JSAMPARRAY output_buf)
 {
-  my_upsample_ptr upsample = (my_upsample_ptr)args.upsample;
+  my_upsample_ptr upsample = (my_upsample_ptr)args->upsample;
   register int y, cred, cgreen, cblue;
   int cb, cr;
   register JSAMPROW outptr;
   JSAMPROW inptr0, inptr1, inptr2;
   JDIMENSION col;
   /* copy these pointers into registers if possible */
-  register JSAMPLE *range_limit = args.sample_range_limit;
+  register JSAMPLE *range_limit = args->sample_range_limit;
   int *Crrtab = upsample->Cr_r_tab;
   int *Cbbtab = upsample->Cb_b_tab;
   JLONG *Crgtab = upsample->Cr_g_tab;
@@ -96,19 +96,19 @@ h2v1_merged_upsample_internal(JDIMENSION output_width,
 INLINE
 LOCAL(void)
 h2v2_merged_upsample_internal(JDIMENSION output_width,
-                              struct jpeg_upsampler_args args,
+                              struct jpeg_upsampler_args *args,
                               JSAMPIMAGE input_buf,
                               JDIMENSION in_row_group_ctr,
                               JSAMPARRAY output_buf)
 {
-  my_upsample_ptr upsample = (my_upsample_ptr)args.upsample;
+  my_upsample_ptr upsample = (my_upsample_ptr)args->upsample;
   register int y, cred, cgreen, cblue;
   int cb, cr;
   register JSAMPROW outptr0, outptr1;
   JSAMPROW inptr00, inptr01, inptr1, inptr2;
   JDIMENSION col;
   /* copy these pointers into registers if possible */
-  register JSAMPLE *range_limit = args.sample_range_limit;
+  register JSAMPLE *range_limit = args->sample_range_limit;
   int *Crrtab = upsample->Cr_r_tab;
   int *Cbbtab = upsample->Cb_b_tab;
   JLONG *Crgtab = upsample->Cr_g_tab;

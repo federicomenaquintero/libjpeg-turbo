@@ -107,7 +107,7 @@ sep_upsample(j_decompress_ptr cinfo, JSAMPIMAGE input_buf,
       /* Invoke per-component upsample method.  Notice we pass a POINTER
        * to color_buf[ci], so that fullsize_upsample can change it.
        */
-      (*upsample->methods[ci]) (cinfo->output_width, args, compptr,
+      (*upsample->methods[ci]) (cinfo->output_width, &args, compptr,
         input_buf[ci] + (*in_row_group_ctr * upsample->rowgroup_height[ci]),
         upsample->color_buf + ci);
     }
@@ -158,7 +158,7 @@ sep_upsample(j_decompress_ptr cinfo, JSAMPIMAGE input_buf,
 
 METHODDEF(void)
 fullsize_upsample(JDIMENSION output_width,
-                  struct jpeg_upsampler_args args,
+                  struct jpeg_upsampler_args *args,
                   jpeg_component_info *compptr,
                   JSAMPARRAY input_data, JSAMPARRAY *output_data_ptr)
 {
@@ -173,7 +173,7 @@ fullsize_upsample(JDIMENSION output_width,
 
 METHODDEF(void)
 noop_upsample(JDIMENSION output_width,
-              struct jpeg_upsampler_args args,
+              struct jpeg_upsampler_args *args,
               jpeg_component_info *compptr,
               JSAMPARRAY input_data, JSAMPARRAY *output_data_ptr)
 {
@@ -194,11 +194,11 @@ noop_upsample(JDIMENSION output_width,
 
 METHODDEF(void)
 int_upsample(JDIMENSION output_width,
-             struct jpeg_upsampler_args args,
+             struct jpeg_upsampler_args *args,
              jpeg_component_info *compptr,
              JSAMPARRAY input_data, JSAMPARRAY *output_data_ptr)
 {
-  my_upsample_ptr upsample = (my_upsample_ptr)args.upsample;
+  my_upsample_ptr upsample = (my_upsample_ptr)args->upsample;
   JSAMPARRAY output_data = *output_data_ptr;
   register JSAMPROW inptr, outptr;
   register JSAMPLE invalue;
@@ -211,7 +211,7 @@ int_upsample(JDIMENSION output_width,
   v_expand = upsample->v_expand[compptr->component_index];
 
   inrow = outrow = 0;
-  while (outrow < args.max_v_samp_factor) {
+  while (outrow < args->max_v_samp_factor) {
     /* Generate one output row with proper horizontal expansion */
     inptr = input_data[inrow];
     outptr = output_data[outrow];
@@ -240,7 +240,7 @@ int_upsample(JDIMENSION output_width,
 
 METHODDEF(void)
 h2v1_upsample(JDIMENSION output_width,
-              struct jpeg_upsampler_args args,
+              struct jpeg_upsampler_args *args,
               jpeg_component_info *compptr,
               JSAMPARRAY input_data, JSAMPARRAY *output_data_ptr)
 {
@@ -250,7 +250,7 @@ h2v1_upsample(JDIMENSION output_width,
   JSAMPROW outend;
   int inrow;
 
-  for (inrow = 0; inrow < args.max_v_samp_factor; inrow++) {
+  for (inrow = 0; inrow < args->max_v_samp_factor; inrow++) {
     inptr = input_data[inrow];
     outptr = output_data[inrow];
     outend = outptr + output_width;
@@ -270,7 +270,7 @@ h2v1_upsample(JDIMENSION output_width,
 
 METHODDEF(void)
 h2v2_upsample(JDIMENSION output_width,
-              struct jpeg_upsampler_args args,
+              struct jpeg_upsampler_args *args,
               jpeg_component_info *compptr,
               JSAMPARRAY input_data, JSAMPARRAY *output_data_ptr)
 {
@@ -281,7 +281,7 @@ h2v2_upsample(JDIMENSION output_width,
   int inrow, outrow;
 
   inrow = outrow = 0;
-  while (outrow < args.max_v_samp_factor) {
+  while (outrow < args->max_v_samp_factor) {
     inptr = input_data[inrow];
     outptr = output_data[outrow];
     outend = outptr + output_width;
@@ -314,7 +314,7 @@ h2v2_upsample(JDIMENSION output_width,
 
 METHODDEF(void)
 h2v1_fancy_upsample(JDIMENSION output_width,
-                    struct jpeg_upsampler_args args,
+                    struct jpeg_upsampler_args *args,
                     jpeg_component_info *compptr,
                     JSAMPARRAY input_data, JSAMPARRAY *output_data_ptr)
 {
@@ -324,7 +324,7 @@ h2v1_fancy_upsample(JDIMENSION output_width,
   register JDIMENSION colctr;
   int inrow;
 
-  for (inrow = 0; inrow < args.max_v_samp_factor; inrow++) {
+  for (inrow = 0; inrow < args->max_v_samp_factor; inrow++) {
     inptr = input_data[inrow];
     outptr = output_data[inrow];
     /* Special case for first column */
@@ -356,7 +356,7 @@ h2v1_fancy_upsample(JDIMENSION output_width,
 
 METHODDEF(void)
 h1v2_fancy_upsample(JDIMENSION output_width,
-                    struct jpeg_upsampler_args args,
+                    struct jpeg_upsampler_args *args,
                     jpeg_component_info *compptr,
                     JSAMPARRAY input_data, JSAMPARRAY *output_data_ptr)
 {
@@ -371,7 +371,7 @@ h1v2_fancy_upsample(JDIMENSION output_width,
   int inrow, outrow, v;
 
   inrow = outrow = 0;
-  while (outrow < args.max_v_samp_factor) {
+  while (outrow < args->max_v_samp_factor) {
     for (v = 0; v < 2; v++) {
       /* inptr0 points to nearest input row, inptr1 points to next nearest */
       inptr0 = input_data[inrow];
@@ -404,7 +404,7 @@ h1v2_fancy_upsample(JDIMENSION output_width,
 
 METHODDEF(void)
 h2v2_fancy_upsample(JDIMENSION output_width,
-                    struct jpeg_upsampler_args args,
+                    struct jpeg_upsampler_args *args,
                     jpeg_component_info *compptr,
                     JSAMPARRAY input_data, JSAMPARRAY *output_data_ptr)
 {
@@ -419,7 +419,7 @@ h2v2_fancy_upsample(JDIMENSION output_width,
   int inrow, outrow, v;
 
   inrow = outrow = 0;
-  while (outrow < args.max_v_samp_factor) {
+  while (outrow < args->max_v_samp_factor) {
     for (v = 0; v < 2; v++) {
       /* inptr0 points to nearest input row, inptr1 points to next nearest */
       inptr0 = input_data[inrow];

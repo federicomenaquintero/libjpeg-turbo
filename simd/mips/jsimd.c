@@ -101,7 +101,7 @@ static const int mips_idct_ifast_coefs[4] = {
 
 /* The following struct is borrowed from jdsample.c */
 typedef void (*upsample1_ptr) (JDIMENSION output_width,
-                               struct jpeg_upsampler_args args,
+                               struct jpeg_upsampler_args *args,
                                jpeg_component_info *compptr,
                                JSAMPARRAY input_data,
                                JSAMPARRAY *output_data_ptr);
@@ -484,36 +484,36 @@ jsimd_can_int_upsample(void)
 
 GLOBAL(void)
 jsimd_h2v2_upsample(JDIMENSION output_width,
-                    struct jpeg_upsampler_args args,
+                    struct jpeg_upsampler_args *args,
                     jpeg_component_info *compptr,
                     JSAMPARRAY input_data, JSAMPARRAY *output_data_ptr)
 {
-  jsimd_h2v2_upsample_dspr2(args.max_v_samp_factor, output_width,
+  jsimd_h2v2_upsample_dspr2(args->max_v_samp_factor, output_width,
                             input_data, output_data_ptr);
 }
 
 GLOBAL(void)
 jsimd_h2v1_upsample(JDIMENSION output_width,
-                    struct jpeg_upsampler_args args,
+                    struct jpeg_upsampler_args *args,
                     jpeg_component_info *compptr,
                     JSAMPARRAY input_data, JSAMPARRAY *output_data_ptr)
 {
-  jsimd_h2v1_upsample_dspr2(args.max_v_samp_factor, output_width,
+  jsimd_h2v1_upsample_dspr2(args->max_v_samp_factor, output_width,
                             input_data, output_data_ptr);
 }
 
 GLOBAL(void)
 jsimd_int_upsample(JDIMENSION output_width,
-                   struct jpeg_upsampler_args args,
+                   struct jpeg_upsampler_args *args,
                    jpeg_component_info *compptr,
                    JSAMPARRAY input_data, JSAMPARRAY *output_data_ptr)
 {
-  my_upsample_ptr upsample = (my_upsample_ptr)args.upsample;
+  my_upsample_ptr upsample = (my_upsample_ptr)args->upsample;
 
   jsimd_int_upsample_dspr2(upsample->h_expand[compptr->component_index],
                            upsample->v_expand[compptr->component_index],
                            input_data, output_data_ptr, output_width,
-                           args.max_v_samp_factor);
+                           args->max_v_samp_factor);
 }
 
 GLOBAL(int)
@@ -556,22 +556,22 @@ jsimd_can_h2v1_fancy_upsample(void)
 
 GLOBAL(void)
 jsimd_h2v2_fancy_upsample(JDIMENSION output_width,
-                          struct jpeg_upsampler_args args,
+                          struct jpeg_upsampler_args *args,
                           jpeg_component_info *compptr,
                           JSAMPARRAY input_data, JSAMPARRAY *output_data_ptr)
 {
-  jsimd_h2v2_fancy_upsample_dspr2(args.max_v_samp_factor,
+  jsimd_h2v2_fancy_upsample_dspr2(args->max_v_samp_factor,
                                   compptr->downsampled_width, input_data,
                                   output_data_ptr);
 }
 
 GLOBAL(void)
 jsimd_h2v1_fancy_upsample(JDIMENSION output_width,
-                          struct jpeg_upsampler_args args,
+                          struct jpeg_upsampler_args *args,
                           jpeg_component_info *compptr,
                           JSAMPARRAY input_data, JSAMPARRAY *output_data_ptr)
 {
-  jsimd_h2v1_fancy_upsample_dspr2(args.max_v_samp_factor,
+  jsimd_h2v1_fancy_upsample_dspr2(args->max_v_samp_factor,
                                   compptr->downsampled_width, input_data,
                                   output_data_ptr);
 }
@@ -612,13 +612,13 @@ jsimd_can_h2v1_merged_upsample(void)
 
 GLOBAL(void)
 jsimd_h2v2_merged_upsample(JDIMENSION output_width,
-                           struct jpeg_upsampler_args args,
+                           struct jpeg_upsampler_args *args,
                            JSAMPIMAGE input_buf,
                            JDIMENSION in_row_group_ctr, JSAMPARRAY output_buf)
 {
   void (*dspr2fct) (JDIMENSION, JSAMPIMAGE, JDIMENSION, JSAMPARRAY, JSAMPLE *);
 
-  switch (args.out_color_space) {
+  switch (args->out_color_space) {
   case JCS_EXT_RGB:
     dspr2fct = jsimd_h2v2_extrgb_merged_upsample_dspr2;
     break;
@@ -646,18 +646,18 @@ jsimd_h2v2_merged_upsample(JDIMENSION output_width,
     break;
   }
 
-  dspr2fct(output_width, input_buf, in_row_group_ctr, output_buf, args.sample_range_limit);
+  dspr2fct(output_width, input_buf, in_row_group_ctr, output_buf, args->sample_range_limit);
 }
 
 GLOBAL(void)
 jsimd_h2v1_merged_upsample(JDIMENSION output_width,
-                           struct jpeg_upsampler_args args,
+                           struct jpeg_upsampler_args *args,
                            JSAMPIMAGE input_buf,
                            JDIMENSION in_row_group_ctr, JSAMPARRAY output_buf)
 {
   void (*dspr2fct) (JDIMENSION, JSAMPIMAGE, JDIMENSION, JSAMPARRAY, JSAMPLE *);
 
-  switch (args.out_color_space) {
+  switch (args->out_color_space) {
   case JCS_EXT_RGB:
     dspr2fct = jsimd_h2v1_extrgb_merged_upsample_dspr2;
     break;
@@ -685,7 +685,7 @@ jsimd_h2v1_merged_upsample(JDIMENSION output_width,
     break;
   }
 
-  dspr2fct(output_width, input_buf, in_row_group_ctr, output_buf, args.sample_range_limit);
+  dspr2fct(output_width, input_buf, in_row_group_ctr, output_buf, args->sample_range_limit);
 }
 
 GLOBAL(int)

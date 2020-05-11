@@ -53,7 +53,7 @@ typedef struct {
 
   /* Pointer to routine to do actual upsampling/conversion of one row group */
   void (*upmethod) (JDIMENSION output_width,
-                    struct jpeg_upsampler_args args,
+                    struct jpeg_upsampler_args *args,
                     JSAMPIMAGE input_buf,
                     JDIMENSION in_row_group_ctr, JSAMPARRAY output_buf);
 
@@ -289,7 +289,7 @@ merged_2v_upsample(j_decompress_ptr cinfo, JSAMPIMAGE input_buf,
       upsample->spare_full = TRUE;
     }
     /* Now do the upsampling. */
-    (*upsample->upmethod) (cinfo->output_width, args, input_buf, *in_row_group_ctr, work_ptrs);
+    (*upsample->upmethod) (cinfo->output_width, &args, input_buf, *in_row_group_ctr, work_ptrs);
   }
 
   /* Adjust counts */
@@ -312,7 +312,7 @@ merged_1v_upsample(j_decompress_ptr cinfo, JSAMPIMAGE input_buf,
   struct jpeg_upsampler_args args = jupsampler_args_from_cinfo(cinfo);
 
   /* Just do the upsampling. */
-  (*upsample->upmethod) (cinfo->output_width, args, input_buf, *in_row_group_ctr,
+  (*upsample->upmethod) (cinfo->output_width, &args, input_buf, *in_row_group_ctr,
                          output_buf + *out_row_ctr);
   /* Adjust counts */
   (*out_row_ctr)++;
@@ -336,11 +336,11 @@ merged_1v_upsample(j_decompress_ptr cinfo, JSAMPIMAGE input_buf,
 
 METHODDEF(void)
 h2v1_merged_upsample(JDIMENSION output_width,
-                     struct jpeg_upsampler_args args,
+                     struct jpeg_upsampler_args *args,
                      JSAMPIMAGE input_buf,
                      JDIMENSION in_row_group_ctr, JSAMPARRAY output_buf)
 {
-  switch (args.out_color_space) {
+  switch (args->out_color_space) {
   case JCS_EXT_RGB:
     extrgb_h2v1_merged_upsample_internal(output_width, args, input_buf, in_row_group_ctr,
                                          output_buf);
@@ -383,11 +383,11 @@ h2v1_merged_upsample(JDIMENSION output_width,
 
 METHODDEF(void)
 h2v2_merged_upsample(JDIMENSION output_width,
-                     struct jpeg_upsampler_args args,
+                     struct jpeg_upsampler_args *args,
                      JSAMPIMAGE input_buf,
                      JDIMENSION in_row_group_ctr, JSAMPARRAY output_buf)
 {
-  switch (args.out_color_space) {
+  switch (args->out_color_space) {
   case JCS_EXT_RGB:
     extrgb_h2v2_merged_upsample_internal(output_width, args, input_buf, in_row_group_ctr,
                                          output_buf);
@@ -513,7 +513,7 @@ static INLINE boolean is_big_endian(void)
 
 METHODDEF(void)
 h2v1_merged_upsample_565(JDIMENSION output_width,
-                         struct jpeg_upsampler_args args,
+                         struct jpeg_upsampler_args *args,
                          JSAMPIMAGE input_buf,
                          JDIMENSION in_row_group_ctr, JSAMPARRAY output_buf)
 {
@@ -528,7 +528,7 @@ h2v1_merged_upsample_565(JDIMENSION output_width,
 
 METHODDEF(void)
 h2v1_merged_upsample_565D(JDIMENSION output_width,
-                          struct jpeg_upsampler_args args,
+                          struct jpeg_upsampler_args *args,
                           JSAMPIMAGE input_buf,
                           JDIMENSION in_row_group_ctr, JSAMPARRAY output_buf)
 {
@@ -543,7 +543,7 @@ h2v1_merged_upsample_565D(JDIMENSION output_width,
 
 METHODDEF(void)
 h2v2_merged_upsample_565(JDIMENSION output_width,
-                         struct jpeg_upsampler_args args,
+                         struct jpeg_upsampler_args *args,
                          JSAMPIMAGE input_buf,
                          JDIMENSION in_row_group_ctr, JSAMPARRAY output_buf)
 {
@@ -558,7 +558,7 @@ h2v2_merged_upsample_565(JDIMENSION output_width,
 
 METHODDEF(void)
 h2v2_merged_upsample_565D(JDIMENSION output_width,
-                          struct jpeg_upsampler_args args,
+                          struct jpeg_upsampler_args *args,
                           JSAMPIMAGE input_buf,
                           JDIMENSION in_row_group_ctr, JSAMPARRAY output_buf)
 {
