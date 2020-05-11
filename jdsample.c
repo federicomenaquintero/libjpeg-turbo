@@ -79,6 +79,20 @@ jupsampler_args_from_cinfo(j_decompress_ptr cinfo)
   return args;
 }
 
+GLOBAL(struct jpeg_component_args)
+jcomponent_args_from_component(jpeg_component_info *compptr)
+{
+  struct jpeg_component_args args;
+
+  args.component_index = compptr->component_index;
+  args.dct_table = compptr->dct_table;
+  args.downsampled_width = compptr->downsampled_width;
+  args.v_samp_factor = compptr->v_samp_factor;
+  args.width_in_blocks = compptr->width_in_blocks;
+
+  return args;
+}
+
 /*
  * Control routine to do upsampling (and color conversion).
  *

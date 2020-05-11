@@ -268,6 +268,17 @@ struct jpeg_upsampler {
   boolean need_context_rows;    /* TRUE if need rows above & below */
 };
 
+/* Component-specific arguments for upsampling/downsampling functions */
+struct jpeg_component_args {
+  int component_index;
+  void *dct_table;
+  JDIMENSION downsampled_width;
+  int v_samp_factor;
+  JDIMENSION width_in_blocks;
+};
+
+EXTERN(struct jpeg_component_args) jcomponent_args_from_component(jpeg_component_info *compptr);
+
 /* Upsampler arguments for the upsampling functions. */
 struct jpeg_upsampler_args {
   int num_components;
