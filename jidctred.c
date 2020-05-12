@@ -118,7 +118,8 @@
  */
 
 GLOBAL(void)
-jpeg_idct_4x4(JSAMPLE *sample_range_limit, jpeg_component_info *compptr,
+jpeg_idct_4x4(JSAMPLE *sample_range_limit,
+              struct jpeg_component_args *comp_args,
               JCOEFPTR coef_block, JSAMPARRAY output_buf,
               JDIMENSION output_col)
 {
@@ -136,7 +137,7 @@ jpeg_idct_4x4(JSAMPLE *sample_range_limit, jpeg_component_info *compptr,
   /* Pass 1: process columns from input, store into work array. */
 
   inptr = coef_block;
-  quantptr = (ISLOW_MULT_TYPE *)compptr->dct_table;
+  quantptr = (ISLOW_MULT_TYPE *)comp_args->dct_table;
   wsptr = workspace;
   for (ctr = DCTSIZE; ctr > 0; inptr++, quantptr++, wsptr++, ctr--) {
     /* Don't bother to process column 4, because second pass won't use it */
@@ -276,7 +277,8 @@ jpeg_idct_4x4(JSAMPLE *sample_range_limit, jpeg_component_info *compptr,
  */
 
 GLOBAL(void)
-jpeg_idct_2x2(JSAMPLE *sample_range_limit, jpeg_component_info *compptr,
+jpeg_idct_2x2(JSAMPLE *sample_range_limit,
+              struct jpeg_component_args *comp_args,
               JCOEFPTR coef_block, JSAMPARRAY output_buf,
               JDIMENSION output_col)
 {
@@ -293,7 +295,7 @@ jpeg_idct_2x2(JSAMPLE *sample_range_limit, jpeg_component_info *compptr,
   /* Pass 1: process columns from input, store into work array. */
 
   inptr = coef_block;
-  quantptr = (ISLOW_MULT_TYPE *)compptr->dct_table;
+  quantptr = (ISLOW_MULT_TYPE *)comp_args->dct_table;
   wsptr = workspace;
   for (ctr = DCTSIZE; ctr > 0; inptr++, quantptr++, wsptr++, ctr--) {
     /* Don't bother to process columns 2,4,6 */
@@ -387,7 +389,8 @@ jpeg_idct_2x2(JSAMPLE *sample_range_limit, jpeg_component_info *compptr,
  */
 
 GLOBAL(void)
-jpeg_idct_1x1(JSAMPLE *sample_range_limit, jpeg_component_info *compptr,
+jpeg_idct_1x1(JSAMPLE *sample_range_limit,
+              struct jpeg_component_args *comp_args,
               JCOEFPTR coef_block, JSAMPARRAY output_buf,
               JDIMENSION output_col)
 {
@@ -399,7 +402,7 @@ jpeg_idct_1x1(JSAMPLE *sample_range_limit, jpeg_component_info *compptr,
   /* We hardly need an inverse DCT routine for this: just take the
    * average pixel value, which is one-eighth of the DC coefficient.
    */
-  quantptr = (ISLOW_MULT_TYPE *)compptr->dct_table;
+  quantptr = (ISLOW_MULT_TYPE *)comp_args->dct_table;
   dcval = DEQUANTIZE(coef_block[0], quantptr[0]);
   dcval = (int)DESCALE((JLONG)dcval, 3);
 

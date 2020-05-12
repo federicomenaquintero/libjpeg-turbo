@@ -13,7 +13,7 @@
 /* Pointer to routine to upsample a single component */
 typedef void (*upsample1_ptr) (JDIMENSION output_width,
                                struct jpeg_upsampler_args *args,
-                               jpeg_component_info *compptr,
+                               struct jpeg_component_args *comp_args,
                                JSAMPARRAY input_data,
                                JSAMPARRAY *output_data_ptr);
 

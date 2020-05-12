@@ -170,7 +170,8 @@
  */
 
 GLOBAL(void)
-jpeg_idct_islow(JSAMPLE *sample_range_limit, jpeg_component_info *compptr,
+jpeg_idct_islow(JSAMPLE *sample_range_limit,
+                struct jpeg_component_args *comp_args,
                 JCOEFPTR coef_block, JSAMPARRAY output_buf,
                 JDIMENSION output_col)
 {
@@ -191,7 +192,7 @@ jpeg_idct_islow(JSAMPLE *sample_range_limit, jpeg_component_info *compptr,
   /* furthermore, we scale the results by 2**PASS1_BITS. */
 
   inptr = coef_block;
-  quantptr = (ISLOW_MULT_TYPE *)compptr->dct_table;
+  quantptr = (ISLOW_MULT_TYPE *)comp_args->dct_table;
   wsptr = workspace;
   for (ctr = DCTSIZE; ctr > 0; ctr--) {
     /* Due to quantization, we will usually find that many of the input
@@ -424,7 +425,8 @@ jpeg_idct_islow(JSAMPLE *sample_range_limit, jpeg_component_info *compptr,
  */
 
 GLOBAL(void)
-jpeg_idct_7x7(JSAMPLE *sample_range_limit, jpeg_component_info *compptr,
+jpeg_idct_7x7(JSAMPLE *sample_range_limit,
+              struct jpeg_component_args *comp_args,
               JCOEFPTR coef_block, JSAMPARRAY output_buf,
               JDIMENSION output_col)
 {
@@ -442,7 +444,7 @@ jpeg_idct_7x7(JSAMPLE *sample_range_limit, jpeg_component_info *compptr,
   /* Pass 1: process columns from input, store into work array. */
 
   inptr = coef_block;
-  quantptr = (ISLOW_MULT_TYPE *)compptr->dct_table;
+  quantptr = (ISLOW_MULT_TYPE *)comp_args->dct_table;
   wsptr = workspace;
   for (ctr = 0; ctr < 7; ctr++, inptr++, quantptr++, wsptr++) {
     /* Even part */
@@ -573,7 +575,8 @@ jpeg_idct_7x7(JSAMPLE *sample_range_limit, jpeg_component_info *compptr,
  */
 
 GLOBAL(void)
-jpeg_idct_6x6(JSAMPLE *sample_range_limit, jpeg_component_info *compptr,
+jpeg_idct_6x6(JSAMPLE *sample_range_limit,
+              struct jpeg_component_args *comp_args,
               JCOEFPTR coef_block, JSAMPARRAY output_buf,
               JDIMENSION output_col)
 {
@@ -591,7 +594,7 @@ jpeg_idct_6x6(JSAMPLE *sample_range_limit, jpeg_component_info *compptr,
   /* Pass 1: process columns from input, store into work array. */
 
   inptr = coef_block;
-  quantptr = (ISLOW_MULT_TYPE *)compptr->dct_table;
+  quantptr = (ISLOW_MULT_TYPE *)comp_args->dct_table;
   wsptr = workspace;
   for (ctr = 0; ctr < 6; ctr++, inptr++, quantptr++, wsptr++) {
     /* Even part */
@@ -694,7 +697,8 @@ jpeg_idct_6x6(JSAMPLE *sample_range_limit, jpeg_component_info *compptr,
  */
 
 GLOBAL(void)
-jpeg_idct_5x5(JSAMPLE *sample_range_limit, jpeg_component_info *compptr,
+jpeg_idct_5x5(JSAMPLE *sample_range_limit,
+              struct jpeg_component_args *comp_args,
               JCOEFPTR coef_block, JSAMPARRAY output_buf,
               JDIMENSION output_col)
 {
@@ -712,7 +716,7 @@ jpeg_idct_5x5(JSAMPLE *sample_range_limit, jpeg_component_info *compptr,
   /* Pass 1: process columns from input, store into work array. */
 
   inptr = coef_block;
-  quantptr = (ISLOW_MULT_TYPE *)compptr->dct_table;
+  quantptr = (ISLOW_MULT_TYPE *)comp_args->dct_table;
   wsptr = workspace;
   for (ctr = 0; ctr < 5; ctr++, inptr++, quantptr++, wsptr++) {
     /* Even part */
@@ -809,7 +813,8 @@ jpeg_idct_5x5(JSAMPLE *sample_range_limit, jpeg_component_info *compptr,
  */
 
 GLOBAL(void)
-jpeg_idct_3x3(JSAMPLE *sample_range_limit, jpeg_component_info *compptr,
+jpeg_idct_3x3(JSAMPLE *sample_range_limit,
+              struct jpeg_component_args *comp_args,
               JCOEFPTR coef_block, JSAMPARRAY output_buf,
               JDIMENSION output_col)
 {
@@ -826,7 +831,7 @@ jpeg_idct_3x3(JSAMPLE *sample_range_limit, jpeg_component_info *compptr,
   /* Pass 1: process columns from input, store into work array. */
 
   inptr = coef_block;
-  quantptr = (ISLOW_MULT_TYPE *)compptr->dct_table;
+  quantptr = (ISLOW_MULT_TYPE *)comp_args->dct_table;
   wsptr = workspace;
   for (ctr = 0; ctr < 3; ctr++, inptr++, quantptr++, wsptr++) {
     /* Even part */
@@ -899,7 +904,8 @@ jpeg_idct_3x3(JSAMPLE *sample_range_limit, jpeg_component_info *compptr,
  */
 
 GLOBAL(void)
-jpeg_idct_9x9(JSAMPLE *sample_range_limit, jpeg_component_info *compptr,
+jpeg_idct_9x9(JSAMPLE *sample_range_limit,
+              struct jpeg_component_args *comp_args,
               JCOEFPTR coef_block, JSAMPARRAY output_buf,
               JDIMENSION output_col)
 {
@@ -917,7 +923,7 @@ jpeg_idct_9x9(JSAMPLE *sample_range_limit, jpeg_component_info *compptr,
   /* Pass 1: process columns from input, store into work array. */
 
   inptr = coef_block;
-  quantptr = (ISLOW_MULT_TYPE *)compptr->dct_table;
+  quantptr = (ISLOW_MULT_TYPE *)comp_args->dct_table;
   wsptr = workspace;
   for (ctr = 0; ctr < 8; ctr++, inptr++, quantptr++, wsptr++) {
     /* Even part */
@@ -1070,7 +1076,8 @@ jpeg_idct_9x9(JSAMPLE *sample_range_limit, jpeg_component_info *compptr,
  */
 
 GLOBAL(void)
-jpeg_idct_10x10(JSAMPLE *sample_range_limit, jpeg_component_info *compptr,
+jpeg_idct_10x10(JSAMPLE *sample_range_limit,
+                struct jpeg_component_args *comp_args,
                 JCOEFPTR coef_block, JSAMPARRAY output_buf,
                 JDIMENSION output_col)
 {
@@ -1089,7 +1096,7 @@ jpeg_idct_10x10(JSAMPLE *sample_range_limit, jpeg_component_info *compptr,
   /* Pass 1: process columns from input, store into work array. */
 
   inptr = coef_block;
-  quantptr = (ISLOW_MULT_TYPE *)compptr->dct_table;
+  quantptr = (ISLOW_MULT_TYPE *)comp_args->dct_table;
   wsptr = workspace;
   for (ctr = 0; ctr < 8; ctr++, inptr++, quantptr++, wsptr++) {
     /* Even part */
@@ -1265,7 +1272,8 @@ jpeg_idct_10x10(JSAMPLE *sample_range_limit, jpeg_component_info *compptr,
  */
 
 GLOBAL(void)
-jpeg_idct_11x11(JSAMPLE *sample_range_limit, jpeg_component_info *compptr,
+jpeg_idct_11x11(JSAMPLE *sample_range_limit,
+                struct jpeg_component_args *comp_args,
                 JCOEFPTR coef_block, JSAMPARRAY output_buf,
                 JDIMENSION output_col)
 {
@@ -1284,7 +1292,7 @@ jpeg_idct_11x11(JSAMPLE *sample_range_limit, jpeg_component_info *compptr,
   /* Pass 1: process columns from input, store into work array. */
 
   inptr = coef_block;
-  quantptr = (ISLOW_MULT_TYPE *)compptr->dct_table;
+  quantptr = (ISLOW_MULT_TYPE *)comp_args->dct_table;
   wsptr = workspace;
   for (ctr = 0; ctr < 8; ctr++, inptr++, quantptr++, wsptr++) {
     /* Even part */
@@ -1459,7 +1467,8 @@ jpeg_idct_11x11(JSAMPLE *sample_range_limit, jpeg_component_info *compptr,
  */
 
 GLOBAL(void)
-jpeg_idct_12x12(JSAMPLE *sample_range_limit, jpeg_component_info *compptr,
+jpeg_idct_12x12(JSAMPLE *sample_range_limit,
+                struct jpeg_component_args *comp_args,
                 JCOEFPTR coef_block, JSAMPARRAY output_buf,
                 JDIMENSION output_col)
 {
@@ -1478,7 +1487,7 @@ jpeg_idct_12x12(JSAMPLE *sample_range_limit, jpeg_component_info *compptr,
   /* Pass 1: process columns from input, store into work array. */
 
   inptr = coef_block;
-  quantptr = (ISLOW_MULT_TYPE *)compptr->dct_table;
+  quantptr = (ISLOW_MULT_TYPE *)comp_args->dct_table;
   wsptr = workspace;
   for (ctr = 0; ctr < 8; ctr++, inptr++, quantptr++, wsptr++) {
     /* Even part */
@@ -1675,7 +1684,8 @@ jpeg_idct_12x12(JSAMPLE *sample_range_limit, jpeg_component_info *compptr,
  */
 
 GLOBAL(void)
-jpeg_idct_13x13(JSAMPLE *sample_range_limit, jpeg_component_info *compptr,
+jpeg_idct_13x13(JSAMPLE *sample_range_limit,
+                struct jpeg_component_args *comp_args,
                 JCOEFPTR coef_block, JSAMPARRAY output_buf,
                 JDIMENSION output_col)
 {
@@ -1694,7 +1704,7 @@ jpeg_idct_13x13(JSAMPLE *sample_range_limit, jpeg_component_info *compptr,
   /* Pass 1: process columns from input, store into work array. */
 
   inptr = coef_block;
-  quantptr = (ISLOW_MULT_TYPE *)compptr->dct_table;
+  quantptr = (ISLOW_MULT_TYPE *)comp_args->dct_table;
   wsptr = workspace;
   for (ctr = 0; ctr < 8; ctr++, inptr++, quantptr++, wsptr++) {
     /* Even part */
@@ -1903,7 +1913,8 @@ jpeg_idct_13x13(JSAMPLE *sample_range_limit, jpeg_component_info *compptr,
  */
 
 GLOBAL(void)
-jpeg_idct_14x14(JSAMPLE *sample_range_limit, jpeg_component_info *compptr,
+jpeg_idct_14x14(JSAMPLE *sample_range_limit,
+                struct jpeg_component_args *comp_args,
                 JCOEFPTR coef_block, JSAMPARRAY output_buf,
                 JDIMENSION output_col)
 {
@@ -1922,7 +1933,7 @@ jpeg_idct_14x14(JSAMPLE *sample_range_limit, jpeg_component_info *compptr,
   /* Pass 1: process columns from input, store into work array. */
 
   inptr = coef_block;
-  quantptr = (ISLOW_MULT_TYPE *)compptr->dct_table;
+  quantptr = (ISLOW_MULT_TYPE *)comp_args->dct_table;
   wsptr = workspace;
   for (ctr = 0; ctr < 8; ctr++, inptr++, quantptr++, wsptr++) {
     /* Even part */
@@ -2129,7 +2140,8 @@ jpeg_idct_14x14(JSAMPLE *sample_range_limit, jpeg_component_info *compptr,
  */
 
 GLOBAL(void)
-jpeg_idct_15x15(JSAMPLE *sample_range_limit, jpeg_component_info *compptr,
+jpeg_idct_15x15(JSAMPLE *sample_range_limit,
+                struct jpeg_component_args *comp_args,
                 JCOEFPTR coef_block, JSAMPARRAY output_buf,
                 JDIMENSION output_col)
 {
@@ -2148,7 +2160,7 @@ jpeg_idct_15x15(JSAMPLE *sample_range_limit, jpeg_component_info *compptr,
   /* Pass 1: process columns from input, store into work array. */
 
   inptr = coef_block;
-  quantptr = (ISLOW_MULT_TYPE *)compptr->dct_table;
+  quantptr = (ISLOW_MULT_TYPE *)comp_args->dct_table;
   wsptr = workspace;
   for (ctr = 0; ctr < 8; ctr++, inptr++, quantptr++, wsptr++) {
     /* Even part */
@@ -2371,7 +2383,8 @@ jpeg_idct_15x15(JSAMPLE *sample_range_limit, jpeg_component_info *compptr,
  */
 
 GLOBAL(void)
-jpeg_idct_16x16(JSAMPLE *sample_range_limit, jpeg_component_info *compptr,
+jpeg_idct_16x16(JSAMPLE *sample_range_limit,
+                struct jpeg_component_args *comp_args,
                 JCOEFPTR coef_block, JSAMPARRAY output_buf,
                 JDIMENSION output_col)
 {
@@ -2390,7 +2403,7 @@ jpeg_idct_16x16(JSAMPLE *sample_range_limit, jpeg_component_info *compptr,
   /* Pass 1: process columns from input, store into work array. */
 
   inptr = coef_block;
-  quantptr = (ISLOW_MULT_TYPE *)compptr->dct_table;
+  quantptr = (ISLOW_MULT_TYPE *)comp_args->dct_table;
   wsptr = workspace;
   for (ctr = 0; ctr < 8; ctr++, inptr++, quantptr++, wsptr++) {
     /* Even part */

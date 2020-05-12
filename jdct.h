@@ -50,7 +50,7 @@ typedef unsigned long long UDCTELEM2;
  * An inverse DCT routine is given a pointer to the input JBLOCK and a pointer
  * to an output sample array.  The routine must dequantize the input data as
  * well as perform the IDCT; for dequantization, it uses the multiplier table
- * pointed to by compptr->dct_table.  The output data is to be placed into the
+ * pointed to by comp_args->dct_table.  The output data is to be placed into the
  * sample array starting at a specified column.  (Any row offset needed will
  * be applied to the array pointer before it is passed to the IDCT code.)
  * Note that the number of samples emitted by the IDCT routine is
@@ -96,58 +96,76 @@ EXTERN(void) jpeg_fdct_ifast(DCTELEM *data);
 EXTERN(void) jpeg_fdct_float(FAST_FLOAT *data);
 
 EXTERN(void) jpeg_idct_islow(JSAMPLE *sample_range_limit,
-                             jpeg_component_info *compptr, JCOEFPTR coef_block,
+                             struct jpeg_component_args *comp_args,
+                             JCOEFPTR coef_block,
                              JSAMPARRAY output_buf, JDIMENSION output_col);
 EXTERN(void) jpeg_idct_ifast(JSAMPLE *sample_range_limit,
-                             jpeg_component_info *compptr, JCOEFPTR coef_block,
+                             struct jpeg_component_args *comp_args,
+                             JCOEFPTR coef_block,
                              JSAMPARRAY output_buf, JDIMENSION output_col);
 EXTERN(void) jpeg_idct_float(JSAMPLE *sample_range_limit,
-                             jpeg_component_info *compptr, JCOEFPTR coef_block,
+                             struct jpeg_component_args *comp_args,
+                             JCOEFPTR coef_block,
                              JSAMPARRAY output_buf, JDIMENSION output_col);
 EXTERN(void) jpeg_idct_7x7(JSAMPLE *sample_range_limit,
-                           jpeg_component_info *compptr, JCOEFPTR coef_block,
+                           struct jpeg_component_args *comp_args,
+                           JCOEFPTR coef_block,
                            JSAMPARRAY output_buf, JDIMENSION output_col);
 EXTERN(void) jpeg_idct_6x6(JSAMPLE *sample_range_limit,
-                           jpeg_component_info *compptr, JCOEFPTR coef_block,
+                           struct jpeg_component_args *comp_args,
+                           JCOEFPTR coef_block,
                            JSAMPARRAY output_buf, JDIMENSION output_col);
 EXTERN(void) jpeg_idct_5x5(JSAMPLE *sample_range_limit,
-                           jpeg_component_info *compptr, JCOEFPTR coef_block,
+                           struct jpeg_component_args *comp_args,
+                           JCOEFPTR coef_block,
                            JSAMPARRAY output_buf, JDIMENSION output_col);
 EXTERN(void) jpeg_idct_4x4(JSAMPLE *sample_range_limit,
-                           jpeg_component_info *compptr, JCOEFPTR coef_block,
+                           struct jpeg_component_args *comp_args,
+                           JCOEFPTR coef_block,
                            JSAMPARRAY output_buf, JDIMENSION output_col);
 EXTERN(void) jpeg_idct_3x3(JSAMPLE *sample_range_limit,
-                           jpeg_component_info *compptr, JCOEFPTR coef_block,
+                           struct jpeg_component_args *comp_args,
+                           JCOEFPTR coef_block,
                            JSAMPARRAY output_buf, JDIMENSION output_col);
 EXTERN(void) jpeg_idct_2x2(JSAMPLE *sample_range_limit,
-                           jpeg_component_info *compptr, JCOEFPTR coef_block,
+                           struct jpeg_component_args *comp_args,
+                           JCOEFPTR coef_block,
                            JSAMPARRAY output_buf, JDIMENSION output_col);
 EXTERN(void) jpeg_idct_1x1(JSAMPLE *sample_range_limit,
-                           jpeg_component_info *compptr, JCOEFPTR coef_block,
+                           struct jpeg_component_args *comp_args,
+                           JCOEFPTR coef_block,
                            JSAMPARRAY output_buf, JDIMENSION output_col);
 EXTERN(void) jpeg_idct_9x9(JSAMPLE *sample_range_limit,
-                           jpeg_component_info *compptr, JCOEFPTR coef_block,
+                           struct jpeg_component_args *comp_args,
+                           JCOEFPTR coef_block,
                            JSAMPARRAY output_buf, JDIMENSION output_col);
 EXTERN(void) jpeg_idct_10x10(JSAMPLE *sample_range_limit,
-                             jpeg_component_info *compptr, JCOEFPTR coef_block,
+                             struct jpeg_component_args *comp_args,
+                             JCOEFPTR coef_block,
                              JSAMPARRAY output_buf, JDIMENSION output_col);
 EXTERN(void) jpeg_idct_11x11(JSAMPLE *sample_range_limit,
-                             jpeg_component_info *compptr, JCOEFPTR coef_block,
+                             struct jpeg_component_args *comp_args,
+                             JCOEFPTR coef_block,
                              JSAMPARRAY output_buf, JDIMENSION output_col);
 EXTERN(void) jpeg_idct_12x12(JSAMPLE *sample_range_limit,
-                             jpeg_component_info *compptr, JCOEFPTR coef_block,
+                             struct jpeg_component_args *comp_args,
+                             JCOEFPTR coef_block,
                              JSAMPARRAY output_buf, JDIMENSION output_col);
 EXTERN(void) jpeg_idct_13x13(JSAMPLE *sample_range_limit,
-                             jpeg_component_info *compptr, JCOEFPTR coef_block,
+                             struct jpeg_component_args *comp_args,
+                             JCOEFPTR coef_block,
                              JSAMPARRAY output_buf, JDIMENSION output_col);
 EXTERN(void) jpeg_idct_14x14(JSAMPLE *sample_range_limit,
-                             jpeg_component_info *compptr, JCOEFPTR coef_block,
+                             struct jpeg_component_args *comp_args,
+                             JCOEFPTR coef_block,
                              JSAMPARRAY output_buf, JDIMENSION output_col);
 EXTERN(void) jpeg_idct_15x15(JSAMPLE *sample_range_limit,
-                             jpeg_component_info *compptr, JCOEFPTR coef_block,
+                             struct jpeg_component_args *comp_args,
+                             JCOEFPTR coef_block,
                              JSAMPARRAY output_buf, JDIMENSION output_col);
 EXTERN(void) jpeg_idct_16x16(JSAMPLE *sample_range_limit,
-                             jpeg_component_info *compptr, JCOEFPTR coef_block,
+                             struct jpeg_component_args *comp_args,
+                             JCOEFPTR coef_block,
                              JSAMPARRAY output_buf, JDIMENSION output_col);
 
 

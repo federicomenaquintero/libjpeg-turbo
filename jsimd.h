@@ -51,7 +51,7 @@ EXTERN(int) jsimd_can_h2v1_downsample(void);
 
 EXTERN(void) jsimd_h2v2_downsample(JDIMENSION image_width,
                                    struct jpeg_downsampler_args *args,
-                                   jpeg_component_info *compptr,
+                                   struct jpeg_component_args *comp_args,
                                    JSAMPARRAY input_data,
                                    JSAMPARRAY output_data);
 
@@ -59,13 +59,13 @@ EXTERN(int) jsimd_can_h2v2_smooth_downsample(void);
 
 EXTERN(void) jsimd_h2v2_smooth_downsample(JDIMENSION image_width,
                                           struct jpeg_downsampler_args *args,
-                                          jpeg_component_info *compptr,
+                                          struct jpeg_component_args *comp_args,
                                           JSAMPARRAY input_data,
                                           JSAMPARRAY output_data);
 
 EXTERN(void) jsimd_h2v1_downsample(JDIMENSION image_width,
                                    struct jpeg_downsampler_args *args,
-                                   jpeg_component_info *compptr,
+                                   struct jpeg_component_args *comp_args,
                                    JSAMPARRAY input_data,
                                    JSAMPARRAY output_data);
 
@@ -75,17 +75,17 @@ EXTERN(int) jsimd_can_int_upsample(void);
 
 EXTERN(void) jsimd_h2v2_upsample(JDIMENSION output_width,
                                  struct jpeg_upsampler_args *args,
-                                 jpeg_component_info *compptr,
+                                 struct jpeg_component_args *comp_args,
                                  JSAMPARRAY input_data,
                                  JSAMPARRAY *output_data_ptr);
 EXTERN(void) jsimd_h2v1_upsample(JDIMENSION output_width,
                                  struct jpeg_upsampler_args *args,
-                                 jpeg_component_info *compptr,
+                                 struct jpeg_component_args *comp_args,
                                  JSAMPARRAY input_data,
                                  JSAMPARRAY *output_data_ptr);
 EXTERN(void) jsimd_int_upsample(JDIMENSION output_width,
                                 struct jpeg_upsampler_args *args,
-                                jpeg_component_info *compptr,
+                                struct jpeg_component_args *comp_args,
                                 JSAMPARRAY input_data,
                                 JSAMPARRAY *output_data_ptr);
 
@@ -94,12 +94,12 @@ EXTERN(int) jsimd_can_h2v1_fancy_upsample(void);
 
 EXTERN(void) jsimd_h2v2_fancy_upsample(JDIMENSION output_width,
                                        struct jpeg_upsampler_args *args,
-                                       jpeg_component_info *compptr,
+                                       struct jpeg_component_args *comp_args,
                                        JSAMPARRAY input_data,
                                        JSAMPARRAY *output_data_ptr);
 EXTERN(void) jsimd_h2v1_fancy_upsample(JDIMENSION output_width,
                                        struct jpeg_upsampler_args *args,
-                                       jpeg_component_info *compptr,
+                                       struct jpeg_component_args *comp_args,
                                        JSAMPARRAY input_data,
                                        JSAMPARRAY *output_data_ptr);
 

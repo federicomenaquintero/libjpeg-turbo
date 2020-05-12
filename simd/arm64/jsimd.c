@@ -381,22 +381,22 @@ jsimd_can_h2v1_downsample(void)
 GLOBAL(void)
 jsimd_h2v2_downsample(JDIMENSION image_width,
                       struct jpeg_downsampler_args *args,
-                      jpeg_component_info *compptr,
+                      struct jpeg_component_args *comp_args,
                       JSAMPARRAY input_data, JSAMPARRAY output_data)
 {
   jsimd_h2v2_downsample_neon(image_width, args->max_v_samp_factor,
-                             compptr->v_samp_factor, compptr->width_in_blocks,
+                             comp_args->v_samp_factor, comp_args->width_in_blocks,
                              input_data, output_data);
 }
 
 GLOBAL(void)
 jsimd_h2v1_downsample(JDIMENSION image_width,
                       struct jpeg_downsampler_args *args,
-                      jpeg_component_info *compptr,
+                      struct jpeg_component_args *comp_args,
                       JSAMPARRAY input_data, JSAMPARRAY output_data)
 {
   jsimd_h2v1_downsample_neon(image_width, args->max_v_samp_factor,
-                             compptr->v_samp_factor, compptr->width_in_blocks,
+                             comp_args->v_samp_factor, comp_args->width_in_blocks,
                              input_data, output_data);
 }
 
@@ -415,7 +415,7 @@ jsimd_can_h2v1_upsample(void)
 GLOBAL(void)
 jsimd_h2v2_upsample(JDIMENSION output_width,
                     struct jpeg_upsampler_args *args,
-                    jpeg_component_info *compptr,
+                    struct jpeg_component_args *comp_args,
                     JSAMPARRAY input_data, JSAMPARRAY *output_data_ptr)
 {
 }
@@ -423,7 +423,7 @@ jsimd_h2v2_upsample(JDIMENSION output_width,
 GLOBAL(void)
 jsimd_h2v1_upsample(JDIMENSION output_width,
                     struct jpeg_upsampler_args *args,
-                    jpeg_component_info *compptr,
+                    struct jpeg_component_args *comp_args,
                     JSAMPARRAY input_data, JSAMPARRAY *output_data_ptr)
 {
 }
@@ -443,7 +443,7 @@ jsimd_can_h2v1_fancy_upsample(void)
 GLOBAL(void)
 jsimd_h2v2_fancy_upsample(JDIMENSION output_width,
                           struct jpeg_upsampler_args *args,
-                          jpeg_component_info *compptr,
+                          struct jpeg_component_args *comp_args,
                           JSAMPARRAY input_data, JSAMPARRAY *output_data_ptr)
 {
 }
@@ -451,7 +451,7 @@ jsimd_h2v2_fancy_upsample(JDIMENSION output_width,
 GLOBAL(void)
 jsimd_h2v1_fancy_upsample(JDIMENSION output_width,
                           struct jpeg_upsampler_args *args,
-                          jpeg_component_info *compptr,
+                          struct jpeg_component_args *comp_args,
                           JSAMPARRAY input_data, JSAMPARRAY *output_data_ptr)
 {
 }
@@ -665,19 +665,21 @@ jsimd_can_idct_4x4(void)
 }
 
 GLOBAL(void)
-jsimd_idct_2x2(JSAMPLE *sample_range_limit, jpeg_component_info *compptr,
+jsimd_idct_2x2(JSAMPLE *sample_range_limit,
+               struct jpeg_component_args *comp_args,
                JCOEFPTR coef_block, JSAMPARRAY output_buf,
                JDIMENSION output_col)
 {
-  jsimd_idct_2x2_neon(compptr->dct_table, coef_block, output_buf, output_col);
+  jsimd_idct_2x2_neon(comp_args->dct_table, coef_block, output_buf, output_col);
 }
 
 GLOBAL(void)
-jsimd_idct_4x4(JSAMPLE *sample_range_limit, jpeg_component_info *compptr,
+jsimd_idct_4x4(JSAMPLE *sample_range_limit,
+               struct jpeg_component_args *comp_args,
                JCOEFPTR coef_block, JSAMPARRAY output_buf,
                JDIMENSION output_col)
 {
-  jsimd_idct_4x4_neon(compptr->dct_table, coef_block, output_buf, output_col);
+  jsimd_idct_4x4_neon(comp_args->dct_table, coef_block, output_buf, output_col);
 }
 
 GLOBAL(int)
@@ -735,25 +737,28 @@ jsimd_can_idct_float(void)
 }
 
 GLOBAL(void)
-jsimd_idct_islow(JSAMPLE *sample_range_limit, jpeg_component_info *compptr,
+jsimd_idct_islow(JSAMPLE *sample_range_limit,
+                 struct jpeg_component_args *comp_args,
                  JCOEFPTR coef_block, JSAMPARRAY output_buf,
                  JDIMENSION output_col)
 {
-  jsimd_idct_islow_neon(compptr->dct_table, coef_block, output_buf,
+  jsimd_idct_islow_neon(comp_args->dct_table, coef_block, output_buf,
                         output_col);
 }
 
 GLOBAL(void)
-jsimd_idct_ifast(JSAMPLE *sample_range_limit, jpeg_component_info *compptr,
+jsimd_idct_ifast(JSAMPLE *sample_range_limit,
+                 struct jpeg_component_args *comp_args,
                  JCOEFPTR coef_block, JSAMPARRAY output_buf,
                  JDIMENSION output_col)
 {
-  jsimd_idct_ifast_neon(compptr->dct_table, coef_block, output_buf,
+  jsimd_idct_ifast_neon(comp_args->dct_table, coef_block, output_buf,
                         output_col);
 }
 
 GLOBAL(void)
-jsimd_idct_float(JSAMPLE *sample_range_limit, jpeg_component_info *compptr,
+jsimd_idct_float(JSAMPLE *sample_range_limit,
+                 struct jpeg_component_args *comp_args,
                  JCOEFPTR coef_block, JSAMPARRAY output_buf,
                  JDIMENSION output_col)
 {

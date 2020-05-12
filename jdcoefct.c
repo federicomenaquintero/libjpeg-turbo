@@ -121,12 +121,15 @@ decompress_onepass(j_decompress_ptr cinfo, JSAMPIMAGE output_buf)
          */
         blkn = 0;               /* index of current DCT block within MCU */
         for (ci = 0; ci < cinfo->comps_in_scan; ci++) {
+          struct jpeg_component_args comp_args;
+
           compptr = cinfo->cur_comp_info[ci];
           /* Don't bother to IDCT an uninteresting component. */
           if (!compptr->component_needed) {
             blkn += compptr->MCU_blocks;
             continue;
           }
+          comp_args = jcomponent_args_from_component(compptr);
           inverse_DCT = cinfo->idct->inverse_DCT[compptr->component_index];
           useful_width = (MCU_col_num < last_MCU_col) ?
                          compptr->MCU_width : compptr->last_col_width;
@@ -139,7 +142,7 @@ decompress_onepass(j_decompress_ptr cinfo, JSAMPIMAGE output_buf)
                 yoffset + yindex < compptr->last_row_height) {
               output_col = start_col;
               for (xindex = 0; xindex < useful_width; xindex++) {
-                (*inverse_DCT) (cinfo->sample_range_limit, compptr,
+                (*inverse_DCT) (cinfo->sample_range_limit, &comp_args,
                                 (JCOEFPTR)coef->MCU_buffer[blkn + xindex],
                                 output_ptr, output_col);
                 output_col += compptr->_DCT_scaled_size;
@@ -282,6 +285,8 @@ decompress_data(j_decompress_ptr cinfo, JSAMPIMAGE output_buf)
   /* OK, output from the virtual arrays. */
   for (ci = 0, compptr = cinfo->comp_info; ci < cinfo->num_components;
        ci++, compptr++) {
+    struct jpeg_component_args comp_args;
+
     /* Don't bother to IDCT an uninteresting component. */
     if (!compptr->component_needed)
       continue;
@@ -300,13 +305,15 @@ decompress_data(j_decompress_ptr cinfo, JSAMPIMAGE output_buf)
     }
     inverse_DCT = cinfo->idct->inverse_DCT[ci];
     output_ptr = output_buf[ci];
+
+    comp_args = jcomponent_args_from_component(compptr);
     /* Loop over all DCT blocks to be processed. */
     for (block_row = 0; block_row < block_rows; block_row++) {
       buffer_ptr = buffer[block_row] + cinfo->master->first_MCU_col[ci];
       output_col = 0;
       for (block_num = cinfo->master->first_MCU_col[ci];
            block_num <= cinfo->master->last_MCU_col[ci]; block_num++) {
-        (*inverse_DCT) (cinfo->sample_range_limit, compptr, (JCOEFPTR)buffer_ptr, output_ptr,
+        (*inverse_DCT) (cinfo->sample_range_limit, &comp_args, (JCOEFPTR)buffer_ptr, output_ptr,
                         output_col);
         buffer_ptr++;
         output_col += compptr->_DCT_scaled_size;
@@ -510,6 +517,8 @@ decompress_smooth_data(j_decompress_ptr cinfo, JSAMPIMAGE output_buf)
       last_block_column = compptr->width_in_blocks - 1;
       for (block_num = cinfo->master->first_MCU_col[ci];
            block_num <= cinfo->master->last_MCU_col[ci]; block_num++) {
+        struct jpeg_component_args comp_args;
+
         /* Fetch current DCT block into workspace so we can modify it. */
         jcopy_block_row(buffer_ptr, (JBLOCKROW)workspace, (JDIMENSION)1);
         /* Update DC values */
@@ -598,7 +607,8 @@ decompress_smooth_data(j_decompress_ptr cinfo, JSAMPIMAGE output_buf)
           workspace[2] = (JCOEF)pred;
         }
         /* OK, do the IDCT */
-        (*inverse_DCT) (cinfo->sample_range_limit, compptr, (JCOEFPTR)workspace, output_ptr,
+        comp_args = jcomponent_args_from_component(compptr);
+        (*inverse_DCT) (cinfo->sample_range_limit, &comp_args, (JCOEFPTR)workspace, output_ptr,
                         output_col);
         /* Advance for next column */
         DC1 = DC2;  DC2 = DC3;

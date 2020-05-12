@@ -168,7 +168,8 @@
  */
 
 GLOBAL(void)
-jpeg_idct_ifast(JSAMPLE *sample_range_limit, jpeg_component_info *compptr,
+jpeg_idct_ifast(JSAMPLE *sample_range_limit,
+                struct jpeg_component_args *comp_args,
                 JCOEFPTR coef_block, JSAMPARRAY output_buf,
                 JDIMENSION output_col)
 {
@@ -188,7 +189,7 @@ jpeg_idct_ifast(JSAMPLE *sample_range_limit, jpeg_component_info *compptr,
   /* Pass 1: process columns from input, store into work array. */
 
   inptr = coef_block;
-  quantptr = (IFAST_MULT_TYPE *)compptr->dct_table;
+  quantptr = (IFAST_MULT_TYPE *)comp_args->dct_table;
   wsptr = workspace;
   for (ctr = DCTSIZE; ctr > 0; ctr--) {
     /* Due to quantization, we will usually find that many of the input

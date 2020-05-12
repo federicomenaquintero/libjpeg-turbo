@@ -87,6 +87,7 @@ jcomponent_args_from_component(jpeg_component_info *compptr)
   args.component_index = compptr->component_index;
   args.dct_table = compptr->dct_table;
   args.downsampled_width = compptr->downsampled_width;
+  args.h_samp_factor = compptr->h_samp_factor;
   args.v_samp_factor = compptr->v_samp_factor;
   args.width_in_blocks = compptr->width_in_blocks;
 
@@ -118,10 +119,11 @@ sep_upsample(j_decompress_ptr cinfo, JSAMPIMAGE input_buf,
   if (upsample->next_row_out >= cinfo->max_v_samp_factor) {
     for (ci = 0, compptr = cinfo->comp_info; ci < cinfo->num_components;
          ci++, compptr++) {
+      struct jpeg_component_args comp_args = jcomponent_args_from_component(compptr);
       /* Invoke per-component upsample method.  Notice we pass a POINTER
        * to color_buf[ci], so that fullsize_upsample can change it.
        */
-      (*upsample->methods[ci]) (cinfo->output_width, &args, compptr,
+      (*upsample->methods[ci]) (cinfo->output_width, &args, &comp_args,
         input_buf[ci] + (*in_row_group_ctr * upsample->rowgroup_height[ci]),
         upsample->color_buf + ci);
     }
@@ -173,7 +175,7 @@ sep_upsample(j_decompress_ptr cinfo, JSAMPIMAGE input_buf,
 METHODDEF(void)
 fullsize_upsample(JDIMENSION output_width,
                   struct jpeg_upsampler_args *args,
-                  jpeg_component_info *compptr,
+                  struct jpeg_component_args *comp_args,
                   JSAMPARRAY input_data, JSAMPARRAY *output_data_ptr)
 {
   *output_data_ptr = input_data;
@@ -188,7 +190,7 @@ fullsize_upsample(JDIMENSION output_width,
 METHODDEF(void)
 noop_upsample(JDIMENSION output_width,
               struct jpeg_upsampler_args *args,
-              jpeg_component_info *compptr,
+              struct jpeg_component_args *comp_args,
               JSAMPARRAY input_data, JSAMPARRAY *output_data_ptr)
 {
   *output_data_ptr = NULL;      /* safety check */
@@ -209,7 +211,7 @@ noop_upsample(JDIMENSION output_width,
 METHODDEF(void)
 int_upsample(JDIMENSION output_width,
              struct jpeg_upsampler_args *args,
-             jpeg_component_info *compptr,
+             struct jpeg_component_args *comp_args,
              JSAMPARRAY input_data, JSAMPARRAY *output_data_ptr)
 {
   my_upsample_ptr upsample = (my_upsample_ptr)args->upsample;
@@ -221,8 +223,8 @@ int_upsample(JDIMENSION output_width,
   int h_expand, v_expand;
   int inrow, outrow;
 
-  h_expand = upsample->h_expand[compptr->component_index];
-  v_expand = upsample->v_expand[compptr->component_index];
+  h_expand = upsample->h_expand[comp_args->component_index];
+  v_expand = upsample->v_expand[comp_args->component_index];
 
   inrow = outrow = 0;
   while (outrow < args->max_v_samp_factor) {
@@ -255,7 +257,7 @@ int_upsample(JDIMENSION output_width,
 METHODDEF(void)
 h2v1_upsample(JDIMENSION output_width,
               struct jpeg_upsampler_args *args,
-              jpeg_component_info *compptr,
+              struct jpeg_component_args *comp_args,
               JSAMPARRAY input_data, JSAMPARRAY *output_data_ptr)
 {
   JSAMPARRAY output_data = *output_data_ptr;
@@ -285,7 +287,7 @@ h2v1_upsample(JDIMENSION output_width,
 METHODDEF(void)
 h2v2_upsample(JDIMENSION output_width,
               struct jpeg_upsampler_args *args,
-              jpeg_component_info *compptr,
+              struct jpeg_component_args *comp_args,
               JSAMPARRAY input_data, JSAMPARRAY *output_data_ptr)
 {
   JSAMPARRAY output_data = *output_data_ptr;
@@ -329,7 +331,7 @@ h2v2_upsample(JDIMENSION output_width,
 METHODDEF(void)
 h2v1_fancy_upsample(JDIMENSION output_width,
                     struct jpeg_upsampler_args *args,
-                    jpeg_component_info *compptr,
+                    struct jpeg_component_args *comp_args,
                     JSAMPARRAY input_data, JSAMPARRAY *output_data_ptr)
 {
   JSAMPARRAY output_data = *output_data_ptr;
@@ -346,7 +348,7 @@ h2v1_fancy_upsample(JDIMENSION output_width,
     *outptr++ = (JSAMPLE)invalue;
     *outptr++ = (JSAMPLE)((invalue * 3 + GETJSAMPLE(*inptr) + 2) >> 2);
 
-    for (colctr = compptr->downsampled_width - 2; colctr > 0; colctr--) {
+    for (colctr = comp_args->downsampled_width - 2; colctr > 0; colctr--) {
       /* General case: 3/4 * nearer pixel + 1/4 * further pixel */
       invalue = GETJSAMPLE(*inptr++) * 3;
       *outptr++ = (JSAMPLE)((invalue + GETJSAMPLE(inptr[-2]) + 1) >> 2);
@@ -371,7 +373,7 @@ h2v1_fancy_upsample(JDIMENSION output_width,
 METHODDEF(void)
 h1v2_fancy_upsample(JDIMENSION output_width,
                     struct jpeg_upsampler_args *args,
-                    jpeg_component_info *compptr,
+                    struct jpeg_component_args *comp_args,
                     JSAMPARRAY input_data, JSAMPARRAY *output_data_ptr)
 {
   JSAMPARRAY output_data = *output_data_ptr;
@@ -398,7 +400,7 @@ h1v2_fancy_upsample(JDIMENSION output_width,
       }
       outptr = output_data[outrow++];
 
-      for (colctr = 0; colctr < compptr->downsampled_width; colctr++) {
+      for (colctr = 0; colctr < comp_args->downsampled_width; colctr++) {
         thiscolsum = GETJSAMPLE(*inptr0++) * 3 + GETJSAMPLE(*inptr1++);
         *outptr++ = (JSAMPLE)((thiscolsum + bias) >> 2);
       }
@@ -419,7 +421,7 @@ h1v2_fancy_upsample(JDIMENSION output_width,
 METHODDEF(void)
 h2v2_fancy_upsample(JDIMENSION output_width,
                     struct jpeg_upsampler_args *args,
-                    jpeg_component_info *compptr,
+                    struct jpeg_component_args *comp_args,
                     JSAMPARRAY input_data, JSAMPARRAY *output_data_ptr)
 {
   JSAMPARRAY output_data = *output_data_ptr;
@@ -450,7 +452,7 @@ h2v2_fancy_upsample(JDIMENSION output_width,
       *outptr++ = (JSAMPLE)((thiscolsum * 3 + nextcolsum + 7) >> 4);
       lastcolsum = thiscolsum;  thiscolsum = nextcolsum;
 
-      for (colctr = compptr->downsampled_width - 2; colctr > 0; colctr--) {
+      for (colctr = comp_args->downsampled_width - 2; colctr > 0; colctr--) {
         /* General case: 3/4 * nearer pixel + 1/4 * further pixel in each */
         /* dimension, thus 9/16, 3/16, 3/16, 1/16 overall */
         nextcolsum = GETJSAMPLE(*inptr0++) * 3 + GETJSAMPLE(*inptr1++);
