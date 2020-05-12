@@ -80,7 +80,7 @@ PB_CENTERJSAMP times 16 db  CENTERJSAMPLE
 ;                      JSAMPARRAY output_buf, JDIMENSION output_col)
 ;
 
-; r10 = jpeg_component_info *compptr
+; r10 = comp_args->dct_table
 ; r11 = JCOEFPTR coef_block
 ; r12 = JSAMPARRAY output_buf
 ; r13d = JDIMENSION output_col

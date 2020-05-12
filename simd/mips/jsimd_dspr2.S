@@ -1088,8 +1088,8 @@ LEAF_DSPR2(jsimd_h2v1_downsample_dspr2)
 /*
  * a0     = cinfo->image_width
  * a1     = cinfo->max_v_samp_factor
- * a2     = compptr->v_samp_factor
- * a3     = compptr->width_in_blocks
+ * a2     = comp_args->v_samp_factor
+ * a3     = comp_args->width_in_blocks
  * 16(sp) = input_data
  * 20(sp) = output_data
  */
@@ -1184,8 +1184,8 @@ LEAF_DSPR2(jsimd_h2v2_downsample_dspr2)
 /*
  * a0     = cinfo->image_width
  * a1     = cinfo->max_v_samp_factor
- * a2     = compptr->v_samp_factor
- * a3     = compptr->width_in_blocks
+ * a2     = comp_args->v_samp_factor
+ * a3     = comp_args->width_in_blocks
  * 16(sp) = input_data
  * 20(sp) = output_data
  */
@@ -1297,17 +1297,17 @@ LEAF_DSPR2(jsimd_h2v2_smooth_downsample_dspr2)
 /*
  * a0     = input_data
  * a1     = output_data
- * a2     = compptr->v_samp_factor
+ * a2     = comp_args->v_samp_factor
  * a3     = cinfo->max_v_samp_factor
  * 16(sp) = cinfo->smoothing_factor
- * 20(sp) = compptr->width_in_blocks
+ * 20(sp) = comp_args->width_in_blocks
  * 24(sp) = cinfo->image_width
  */
     .set at
 
     SAVE_REGS_ON_STACK 32, s0, s1, s2, s3, s4, s5, s6, s7
 
-    lw          s7, 52(sp)      // compptr->width_in_blocks
+    lw          s7, 52(sp)      // comp_args->width_in_blocks
     lw          s0, 56(sp)      // cinfo->image_width
     lw          s6, 48(sp)      // cinfo->smoothing_factor
     sll         s7, 3           // output_cols = width_in_blocks * DCTSIZE
@@ -1596,8 +1596,8 @@ END(jsimd_h2v2_smooth_downsample_dspr2)
 /*****************************************************************************/
 LEAF_DSPR2(jsimd_int_upsample_dspr2)
 /*
- * a0     = upsample->h_expand[compptr->component_index]
- * a1     = upsample->v_expand[compptr->component_index]
+ * a0     = upsample->h_expand[comp_args->component_index]
+ * a1     = upsample->v_expand[comp_args->component_index]
  * a2     = input_data
  * a3     = output_data_ptr
  * 16(sp) = cinfo->output_width
@@ -1830,7 +1830,7 @@ END(jsimd_h2v2_upsample_dspr2)
 LEAF_DSPR2(jsimd_idct_islow_dspr2)
 /*
  * a0 = coef_block
- * a1 = compptr->dcttable
+ * a1 = comp_args->dct_table
  * a2 = output
  * a3 = range_limit
  */
@@ -2898,7 +2898,7 @@ END(jsimd_quantize_float_dspr2)
 /*****************************************************************************/
 LEAF_DSPR2(jsimd_idct_2x2_dspr2)
 /*
- * a0 = compptr->dct_table
+ * a0 = comp_args->dct_table
  * a1 = coef_block
  * a2 = output_buf
  * a3 = output_col
@@ -3118,7 +3118,7 @@ END(jsimd_idct_2x2_dspr2)
 /*****************************************************************************/
 LEAF_DSPR2(jsimd_idct_4x4_dspr2)
 /*
- * a0     = compptr->dct_table
+ * a0     = comp_args->dct_table
  * a1     = coef_block
  * a2     = output_buf
  * a3     = output_col
@@ -3479,7 +3479,7 @@ END(jsimd_idct_4x4_dspr2)
 /*****************************************************************************/
 LEAF_DSPR2(jsimd_idct_6x6_dspr2)
 /*
- * a0 = compptr->dct_table
+ * a0 = comp_args->dct_table
  * a1 = coef_block
  * a2 = output_buf
  * a3 = output_col
@@ -3635,7 +3635,7 @@ END(jsimd_idct_6x6_dspr2)
 /*****************************************************************************/
 LEAF_DSPR2(jsimd_idct_12x12_pass1_dspr2)
 /*
- * a0 = compptr->dct_table
+ * a0 = comp_args->dct_table
  * a1 = coef_block
  * a2 = workspace
  */

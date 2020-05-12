@@ -282,7 +282,7 @@ PW_1_NEG1                  times 8  dw  1
 ;                       JSAMPARRAY output_buf, JDIMENSION output_col)
 ;
 
-%define dct_table(b)   (b) + 8          ; jpeg_component_info *compptr
+%define dct_table(b)   (b) + 8          ; comp_args->dct_table
 %define coef_block(b)  (b) + 12         ; JCOEFPTR coef_block
 %define output_buf(b)  (b) + 16         ; JSAMPARRAY output_buf
 %define output_col(b)  (b) + 20         ; JDIMENSION output_col
