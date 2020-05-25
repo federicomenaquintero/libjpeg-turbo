@@ -249,9 +249,9 @@ rgb_ycc_start(j_compress_ptr cinfo)
  * Convert some rows of samples to the JPEG colorspace.
  */
 
-METHODDEF(void)
-rgb_ycc_convert(struct jpeg_color_converter_input *input,
-                JSAMPIMAGE output_buf, JDIMENSION output_row, int num_rows)
+GLOBAL(void)
+jnosimd_rgb_ycc_convert(struct jpeg_color_converter_input *input,
+                        JSAMPIMAGE output_buf, JDIMENSION output_row, int num_rows)
 {
   switch (input->in_color_space) {
   case JCS_EXT_RGB:
@@ -655,7 +655,7 @@ jinit_color_converter(j_compress_ptr cinfo)
         cconvert->pub.color_convert = jsimd_rgb_ycc_convert;
       else {
         cconvert->pub.start_pass = rgb_ycc_start;
-        cconvert->pub.color_convert = rgb_ycc_convert;
+        cconvert->pub.color_convert = jnosimd_rgb_ycc_convert;
       }
     } else if (cinfo->in_color_space == JCS_YCbCr) {
 #if defined(__mips__)
